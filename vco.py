@@ -8,7 +8,8 @@ import random
 import matplotlib.pyplot as plot
 
 class GlobalTransport:
-    def __init__(self, nodes):
+    def __init__(self, nodes, buffer_len=512):
+        self.buffer_len = buffer_len
         self.nodes = nodes
         self.count = 0;
         self.buffer = []
@@ -18,7 +19,7 @@ class GlobalTransport:
         pass
     def get_block(self):
         self.buffer = []
-        for i in range(512):
+        for i in range(self.buffer_len):
             sample = 0
             for node in self.nodes:
                 s = node.get_sample()
@@ -27,17 +28,17 @@ class GlobalTransport:
         return self.buffer
     def buffer_cb(self, indata, outdata, frames, time, status):
         block = self.get_block()
-        arry = np.array(block).reshape((512, 1))
+        arry = np.array(block).reshape((self.buffer_len, 1))
         outdata[:] = arry
     def begin_thread(self):
         while True:
             with sd.Stream(channels=1, callback=self.buffer_cb):
-                sd.sleep(9375)
+                sd.sleep(int((48000 / self.buffer_len) * 1000))
     def start(self):
         threading.Thread(target=self.begin_thread).start()
 
 class VCO:
-    def __init__(self, freq, gain, offset=0, freqct=None, gainct=None):
+    def __init__(self, freq, gain, offset=0, freqct=None, gainct=None, fmct=None):
         self.freq = float(freq)
         self.gain = float(gain)
         self.offset = float(offset)
@@ -45,21 +46,50 @@ class VCO:
         self.fs = 48000
         self.freqct = freqct
         self.gainct = gainct
+        self.fmct = fmct
     def pitch_to(self, freq):
         self.freq = freq
     def gain_to(self, gain):
         self.gain = gain
     def get_sample(self):
-        freqcv = 0.0
+        fmcv = 0.0
         if not self.freqct == None:
-            freqcv = self.freqct.get_sample()
+            f = self.freqct.get_sample()
+            self.pitch_to(f)
+        if not self.fmct == None:
+            for fm in self.fmct:
+                fmcv = fmcv + fm.get_sample()
+            # fmcv = self.fmct.get_sample()
         if not self.gainct == None:
             gaincv = self.gainct.get_sample()
             self.gain_to(gaincv)
         pos = (self.count + 1) / self.fs
-        value = math.sin(freqcv + self.freq * 2.0 * math.pi * pos)
+        value = math.sin(fmcv + self.freq * 2.0 * math.pi * pos)
         value = value * self.gain + self.offset
         self.count = (self.count + 1)
+        return value
+
+class Random:
+    def __init__(self, freq, gain, offset):
+        self.fs = 48000
+        self.count = 0
+        self.freq = float(freq)
+        self.gain = float(gain)
+        self.offset = float(offset)
+        self.start_val = self.get_value()
+        self.end_val = self.get_value()
+        self.step_val = (self.end_val - self.start_val) / self.freq
+    def get_value(self):
+        return random.random() * self.gain + self.offset
+    def next_value(self):
+        self.start_val = self.end_val
+        self.end_val = self.get_value()
+        self.step_val = (self.end_val - self.start_val) / self.freq
+    def get_sample(self):
+        value = self.start_val + (self.step_val * self.count)
+        self.count = (self.count + 1) % self.freq
+        if self.count == 0:
+            self.next_value()
         return value
 
 def graph_node(node, samples):
@@ -90,23 +120,17 @@ class Mixer:
             sample = sample * self.gainct.get_sample()
         return sample
 
-amp = VCO(0.5, 0.1, 0.9)
-op = VCO(0.2, 1)
-ctl = VCO(100, 5, gainct=op)
-grh = VCO(300.0, 1, freqct=ctl)
+rand = Random(48000, 500, 100)
+op = Random(48000, 1, 0.5)
+amp = VCO(0, 1.0, 5)
+rfreq = Random(freq=48000, gain=500, offset=400)
+ctl = VCO(100, 5, gainct=op, fmct=[rand])
+am = Random(freq=10000, gain=10, offset=390)
+grh = VCO(300.0, 1, fmct=[ctl, rfreq, am])
 env = Mixer([grh], amp)
-
-# graph_node(env, 4800)
 
 gt = GlobalTransport([env])
 gt.start()
-
-
-while True:
-    sleep(random.random() * 5)
-    r = random.random() * 200 + 60
-    grh.pitch_to(r)
-
 
 #
 #
