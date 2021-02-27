@@ -38,7 +38,7 @@ class GlobalTransport:
         threading.Thread(target=self.begin_thread).start()
 
 class VCO:
-    def __init__(self, freq, gain, offset=0, freqct=None, gainct=None, fmct=None):
+    def __init__(self, freq=100.0, gain=1.0, offset=0.0, freqct=None, gainct=None, fmct=None):
         self.freq = float(freq)
         self.gain = float(gain)
         self.offset = float(offset)
@@ -69,18 +69,36 @@ class VCO:
         self.count = (self.count + 1)
         return value
 
-class Random:
-    def __init__(self, freq, gain, offset):
-        self.fs = 48000
-        self.count = 0
+class Saw:
+    def __init__(self, freq=100.0, gain=1.0, offset=0.0, freqct=None, gainct=None, fmct=None):
         self.freq = float(freq)
         self.gain = float(gain)
         self.offset = float(offset)
+        self.count = 0
+        self.fs = 48000
+        self.freqct = freqct
+        self.gainct = gainct
+        self.fmct = fmct
+    def pitch_to(self, freq):
+        self.freq = freq
+    def gain_to(self, gain):
+        self.gain = gain
+    def get_sample(self):
+        value = (self.count % self.freq) / self.freq
+        value = value * self.gain + self.offset
+        self.count = (self.count + 1)
+        return value
+
+class Random:
+    def __init__(self, freq):
+        self.fs = 48000
+        self.count = 0
+        self.freq = float(freq)
         self.start_val = self.get_value()
         self.end_val = self.get_value()
         self.step_val = (self.end_val - self.start_val) / self.freq
     def get_value(self):
-        return random.random() * self.gain + self.offset
+        return random.random()
     def next_value(self):
         self.start_val = self.end_val
         self.end_val = self.get_value()
@@ -101,6 +119,7 @@ def graph_node(node, samples):
         time.append(i)
     plot.plot(time, samps)
     plot.title('Sine wave')
+    # plot.yscale('log')
     plot.xlabel('Time')
     plot.ylabel('Amplitude = sin(time)')
     plot.grid(True, which='both')
@@ -120,16 +139,59 @@ class Mixer:
             sample = sample * self.gainct.get_sample()
         return sample
 
-rand = Random(48000, 500, 100)
-op = Random(48000, 1, 0.5)
-amp = VCO(0, 1.0, 5)
-rfreq = Random(freq=48000, gain=500, offset=400)
-ctl = VCO(100, 5, gainct=op, fmct=[rand])
-am = Random(freq=10000, gain=10, offset=390)
-grh = VCO(300.0, 1, fmct=[ctl, rfreq, am])
-env = Mixer([grh], amp)
+class LinToLog:
+    def __init__(self, node, amp=1.0, offset=0.0):
+        self.node = node
+        self.amp = amp
+        self.offset = offset
+    def get_sample(self):
+        val = self.node.get_sample()
+        if val < 0.000001:
+            val = 0.000001
+        if val > 1:
+            val = 1
+        # val = (10 * math.log10(val+0.0) + 60.0) / 60.0
+        # val = (10 * math.log10(val+2.0) + 0.0) / 0.0
+        val = (10 * math.log10(val+0.0) + 60.0) / 60.0
+        # val = val * self.amp + self.offset
+        return val
 
-gt = GlobalTransport([env])
+class LinToExp:
+    def __init__(self, node, amp=1.0, offset=0.0):
+        self.node = node
+        self.amp = amp * 10.0
+        self.offset = offset
+    def get_sample(self):
+        val = self.node.get_sample()
+        if val < 0.000001:
+            val = 0.000001
+        if val > 1:
+            val = 1
+        val = (math.pow(self.amp, val) - 1) / (0.9 * self.amp)
+        return val
+
+# rand = Random(48000, 500, 100)
+# op = Random(48000, 1, 0.5)
+# amp = VCO(0, 1.0, 5)
+# rfreq = Random(freq=48000, gain=500, offset=400)
+# ctl = VCO(100, 5, gainct=op, fmct=[rand])
+# am = Random(freq=10000, gain=10, offset=390)
+# grh = VCO(300.0, 1, fmct=[ctl, rfreq, am])
+# env = Mixer([grh], amp)
+
+saw = Saw(48000, -1.0, 1.0)
+# log = Random(4800)
+#
+#
+# con = LinToLog(log, 1.0)
+env = LinToExp(saw, 1000000.0)
+
+osc = VCO(freq=200, gainct=env)
+
+# graph_node(env, 48000 * 3)
+# graph_node(saw, 48000 * 3)
+
+gt = GlobalTransport([osc])
 gt.start()
 
 #
