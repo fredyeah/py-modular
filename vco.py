@@ -1,14 +1,18 @@
 from time import sleep
 import threading
 import sounddevice as sd
+import soundfile as sf
 import numpy as np
 import struct
 import math
 import random
 import matplotlib.pyplot as plot
 
+BUFFER_SIZE = 2048
+TEST_FILE = []
+
 class GlobalTransport:
-    def __init__(self, nodes, buffer_len=1024):
+    def __init__(self, nodes, buffer_len=BUFFER_SIZE):
         self.buffer_len = buffer_len
         self.nodes = nodes
         self.count = 0;
@@ -25,6 +29,7 @@ class GlobalTransport:
                 s = node.get_sample()
                 sample = (s + sample) / 2
             self.buffer.append(sample)
+            TEST_FILE.append(sample)
         return self.buffer
     def buffer_cb(self, indata, outdata, frames, time, status):
         block = self.get_block()
@@ -32,7 +37,7 @@ class GlobalTransport:
         outdata[:] = arry
     def begin_thread(self):
         while True:
-            with sd.Stream(channels=1, samplerate=48000, blocksize=1024, callback=self.buffer_cb):
+            with sd.Stream(channels=1, samplerate=48000, blocksize=BUFFER_SIZE, callback=self.buffer_cb):
                 sd.sleep(int((48000 / self.buffer_len) * 1000))
     def start(self):
         threading.Thread(target=self.begin_thread).start()
@@ -53,8 +58,10 @@ class VCO:
         self.gain = gain
     def get_sample(self):
         fmcv = 0.0
+        theta = 0.0
         if not self.freqct == None:
             f = self.freqct.get_sample()
+            theta = (1 / f) * 2 * math.pi
             self.pitch_to(f)
         if not self.fmct == None:
             for fm in self.fmct:
@@ -64,10 +71,18 @@ class VCO:
             gaincv = self.gainct.get_sample()
             self.gain_to(gaincv)
         pos = (self.count + 1) / self.fs
-        value = math.sin(fmcv + self.freq * 2.0 * math.pi * pos)
+        value = math.sin(fmcv + theta + self.freq * 2.0 * math.pi * pos)
         value = value * self.gain + self.offset
         self.count = (self.count + 1)
         return value
+
+# math.sin(theta + self.freq * 2.0 * math.pi * pos) = sin(theta)cos(2pixf) + cos(theta)sin(2pixf)
+# sin(theta)cos(2pixf) = cos(theta)sin(2pixf)
+# cos(2pixf)/sin(2pixf) = cos(theta)/sin(theta)
+# cot(2pixf) = cot(theta)
+
+
+
 
 class Saw:
     def __init__(self, freq=100.0, gain=1.0, offset=0.0, freqct=None, gainct=None, fmct=None):
@@ -133,6 +148,15 @@ def graph_node(node, samples):
     plot.show()
     plot.show()
 
+def record_file(node, seconds=5):
+    buffer = []
+    for i in range(48000 * seconds):
+        # if (i % int((random.random() + 0.0001) * 48000 * 3)) == 0:
+        #     en.trigger()
+        samp = node.get_sample() / 10.0
+        buffer.append(samp)
+    sf.write('TEST_FILE.wav', buffer, 48000)
+
 class Mixer:
     def __init__(self, nodes, gainct=None):
         self.nodes = nodes
@@ -196,12 +220,6 @@ class Envelope:
     def trigger(self):
         self.playing = True
     def get_sample(self):
-        # if not self.gatect == None:
-        #     s = self.gatect.get_sample()
-        #     if s < self.lth:
-        #         self.last_lth = s
-        #     if s > self.hth:
-        #         self.last_hth = s
         value = 0.0
         if self.playing == True:
             value = 1 - self.count * self.step
@@ -222,7 +240,7 @@ class Delay:
         self.buffer = [0.0] * len
         self.txrx = 0
     def get_sample(self):
-        samp = (self.node.get_sample() + self.buffer[self.txrx]) / 2.0
+        samp = (self.node.get_sample() + self.buffer[self.txrx] * 1.5) / 1.55
         value = self.buffer[self.txrx]
         self.buffer[self.txrx] = samp
         self.txrx = (self.txrx + 1) % self.len
@@ -251,51 +269,72 @@ class Filter:
         self.out_data = self.out_data - (self.coef * (self.out_data - in_data))
         return self.out_data
 
+class Lim:
+    def __init__(self, node):
+        self.node = node
+    def get_sample(self):
+        s = self.node.get_sample()
+        if s > 1.0:
+            s = 1.0
+        if s < -1.0:
+            s = -1.0
+        return s
 
-# rand = Random(48000, 500, 100)
-# op = Random(48000, 1, 0.5)
-# amp = VCO(0, 1.0, 5)
-# rfreq = Random(freq=48000, gain=500, offset=400)
-# ctl = VCO(100, 5, gainct=op, fmct=[rand])
-# am = Random(freq=10000, gain=10, offset=390)
-# grh = VCO(300.0, 1, fmct=[ctl, rfreq, am])
-# env = Mixer([grh], amp)
-
-# ctl = VCO(0.1, 10000, 11000)
-rnc = Random(4000)
-att = Atten(rnc, 20000.0, 20000.1)
-saw = Saw(1, -1.0, 1.0, fmct=[att])
 en = Envelope(1.3)
 conv = LinToExp(en, 1000.0)
-# log = Random(4800)
-#
-#
-# con = LinToLog(log, 1.0)
-env = LinToExp(saw, 10.0)
 
+osc = VCO(freq=300, gainct=conv, fmct=[
+        VCO(freq=0.254, gain=150.0, offset=200.0),
+        Atten(Random(100000), 100.0, 200.0),
+        VCO(freq=220, fmct=[Random(10000)])
+    ])
 
-osc = VCO(freq=200, gainct=conv, fmct=[VCO(freq=0.254, gain=150.0, offset=200.0), Atten(Random(100000), 100.0, 200.0), VCO(freq=220, fmct=[Random(10000)])])
-
-# graph_node(ctl, 48000 * 1)
-# graph_node(saw, 48000 * 1)
-# graph_node(env, 48000 * 3)
 en.trigger()
 # graph_node(conv, 48000 * 1)
 
 mult = Mult(osc)
-dly = Delay(Delay(Delay(mult, 30009), 798), 120)
+dly = Delay(Delay(Delay(mult, 309), 798), 120)
 
 master = Mixer([mult, dly])
 COEF = 0.12
 fil = Filter(Filter(Filter(Filter(master, COEF), COEF), COEF), COEF)
 
+pitch = Envelope(1)
+penv = LinToExp(pitch, 10000.0)
+fenv = Atten(penv, gain=1000, offset=1001)
+pitch.trigger()
 
-gt = GlobalTransport([fil])
-gt.start()
+ctl = Mult(fenv)
 
-while True:
-    sleep(random.random() * 3)
-    en.trigger()
+kick = VCO(freq=0,
+    # gainct=LinToExp(
+    #     Saw(freq=3, gain=-1.0, offset=1.0), 100.0
+    # ),
+    gainct=ctl,
+    freqct=ctl
+)
+
+graph_node(kick, 48000)
+
+
+tp = GlobalTransport([kick])
+tp.start()
+
+
+
+
+
+
+# gt = GlobalTransport([fil])
+# gt.start()
+
+# while True:
+#     sleep(random.random() * 3)
+#     osc.pitch_to(random.random() * 200 + 200)
+#     en.trigger()
+    # if input('write: ') == 'true':
+    #
+    #     exit()
 
 #
 #
