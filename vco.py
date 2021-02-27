@@ -8,7 +8,7 @@ import random
 import matplotlib.pyplot as plot
 
 class GlobalTransport:
-    def __init__(self, nodes, buffer_len=512):
+    def __init__(self, nodes, buffer_len=1024):
         self.buffer_len = buffer_len
         self.nodes = nodes
         self.count = 0;
@@ -32,7 +32,7 @@ class GlobalTransport:
         outdata[:] = arry
     def begin_thread(self):
         while True:
-            with sd.Stream(channels=1, callback=self.buffer_cb):
+            with sd.Stream(channels=1, samplerate=48000, blocksize=1024, callback=self.buffer_cb):
                 sd.sleep(int((48000 / self.buffer_len) * 1000))
     def start(self):
         threading.Thread(target=self.begin_thread).start()
@@ -241,6 +241,16 @@ class Mult:
         self.flip = not self.flip
         return self.value
 
+class Filter:
+    def __init__(self, node, coef=0.0):
+        self.node = node
+        self.coef = coef
+        self.out_data = 0.0
+    def get_sample(self):
+        in_data = self.node.get_sample()
+        self.out_data = self.out_data - (self.coef * (self.out_data - in_data))
+        return self.out_data
+
 
 # rand = Random(48000, 500, 100)
 # op = Random(48000, 1, 0.5)
@@ -273,14 +283,18 @@ en.trigger()
 # graph_node(conv, 48000 * 1)
 
 mult = Mult(osc)
-dly = Delay(mult, 10000)
+dly = Delay(Delay(Delay(mult, 30009), 798), 120)
+
+master = Mixer([mult, dly])
+COEF = 0.12
+fil = Filter(Filter(Filter(Filter(master, COEF), COEF), COEF), COEF)
 
 
-gt = GlobalTransport([mult, dly])
+gt = GlobalTransport([fil])
 gt.start()
 
 while True:
-    input('enter: ')
+    sleep(random.random() * 3)
     en.trigger()
 
 #
