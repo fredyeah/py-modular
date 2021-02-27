@@ -5,6 +5,7 @@ import numpy as np
 import struct
 import math
 import random
+import matplotlib.pyplot as plot
 
 class GlobalTransport:
     def __init__(self, nodes):
@@ -36,26 +37,46 @@ class GlobalTransport:
         threading.Thread(target=self.begin_thread).start()
 
 class VCO:
-    def __init__(self, freq, gain, offset=0, freqct=None):
-        self.freq = freq
-        self.gain = gain
-        self.offset = offset
+    def __init__(self, freq, gain, offset=0, freqct=None, gainct=None):
+        self.freq = float(freq)
+        self.gain = float(gain)
+        self.offset = float(offset)
         self.count = 0
         self.fs = 48000
         self.freqct = freqct
+        self.gainct = gainct
     def pitch_to(self, freq):
         self.freq = freq
     def gain_to(self, gain):
         self.gain = gain
     def get_sample(self):
+        freqcv = 0.0
         if not self.freqct == None:
-            cv = self.freqct.get_sample()
-            self.pitch_to(cv)
+            freqcv = self.freqct.get_sample()
+        if not self.gainct == None:
+            gaincv = self.gainct.get_sample()
+            self.gain_to(gaincv)
         pos = (self.count + 1) / self.fs
-        value = math.sin(self.freq * 2.0 * math.pi * pos)
+        value = math.sin(freqcv + self.freq * 2.0 * math.pi * pos)
         value = value * self.gain + self.offset
-        self.count = (self.count + 1) % self.fs
+        self.count = (self.count + 1)
         return value
+
+def graph_node(node, samples):
+    time = []
+    samps = []
+    for i in range(samples):
+        sample = node.get_sample()
+        samps.append(sample)
+        time.append(i)
+    plot.plot(time, samps)
+    plot.title('Sine wave')
+    plot.xlabel('Time')
+    plot.ylabel('Amplitude = sin(time)')
+    plot.grid(True, which='both')
+    plot.axhline(y=0, color='k')
+    plot.show()
+    plot.show()
 
 class Mixer:
     def __init__(self, nodes, gainct=None):
@@ -69,26 +90,22 @@ class Mixer:
             sample = sample * self.gainct.get_sample()
         return sample
 
-amp = VCO(0.1, 0.5, 0.5)
-lfo = VCO(400, 10.0, 100.0)
-vco = VCO(440, 0.8, 0, lfo)
-vca = VCO(400, 1.0)
-vcb = VCO(120, 1.0)
-mx = Mixer([vca, vcb], amp)
-gt = GlobalTransport([mx])
+amp = VCO(0.5, 0.1, 0.9)
+op = VCO(0.2, 1)
+ctl = VCO(100, 5, gainct=op)
+grh = VCO(300.0, 1, freqct=ctl)
+env = Mixer([grh], amp)
+
+# graph_node(env, 4800)
+
+gt = GlobalTransport([env])
 gt.start()
-# gt.add_node(vco)
+
 
 while True:
-    f = input('lfo freq: ')
-    lfo.pitch_to(f)
-    # sleep(random.random() * 5)
-    # a = random.random() * 200 + 60
-    # b = random.random() * 200 + 60
-    # a = int(a)
-    # b = int(b)
-    # vca.pitch_to(a)
-    # vcb.pitch_to(b)
+    sleep(random.random() * 5)
+    r = random.random() * 200 + 60
+    grh.pitch_to(r)
 
 
 #
