@@ -71,7 +71,7 @@ class VCO:
 
 class Saw:
     def __init__(self, freq=100.0, gain=1.0, offset=0.0, freqct=None, gainct=None, fmct=None):
-        self.freq = float(freq)
+        self.freq = float(48000/freq)
         self.gain = float(gain)
         self.offset = float(offset)
         self.count = 0
@@ -80,11 +80,17 @@ class Saw:
         self.gainct = gainct
         self.fmct = fmct
     def pitch_to(self, freq):
-        self.freq = freq
+        self.freq = float(48000/freq)
     def gain_to(self, gain):
         self.gain = gain
     def get_sample(self):
-        value = (self.count % self.freq) / self.freq
+        if not self.freqct == None:
+            self.pitch_to(self.freqct.get_sample())
+        fmcv = 0.0
+        if not self.fmct == None:
+            for fm in self.fmct:
+                fmcv = fmcv + fm.get_sample()
+        value = ((self.count + fmcv) % self.freq) / self.freq
         value = value * self.gain + self.offset
         self.count = (self.count + 1)
         return value
@@ -161,6 +167,8 @@ class LinToExp:
         self.node = node
         self.amp = amp * 10.0
         self.offset = offset
+    def amp_to(self, amp):
+        self.amp = amp
     def get_sample(self):
         val = self.node.get_sample()
         if val < 0.000001:
@@ -169,6 +177,70 @@ class LinToExp:
             val = 1
         val = (math.pow(self.amp, val) - 1) / (0.9 * self.amp)
         return val
+
+class Atten:
+    def __init__(self, node, gain=1.0, offset=0.0):
+        self.node = node
+        self.gain = gain
+        self.offset = offset
+    def get_sample(self):
+        return self.node.get_sample() * self.gain + self.offset
+
+class Envelope:
+    def __init__(self, len, gatect=None):
+        self.len = 48000.0 / len
+        self.count = 0
+        self.step = 1 / self.len
+        self.playing = False
+        self.gatect = gatect
+    def trigger(self):
+        self.playing = True
+    def get_sample(self):
+        # if not self.gatect == None:
+        #     s = self.gatect.get_sample()
+        #     if s < self.lth:
+        #         self.last_lth = s
+        #     if s > self.hth:
+        #         self.last_hth = s
+        value = 0.0
+        if self.playing == True:
+            value = 1 - self.count * self.step
+            self.count = self.count + 1
+            if self.count >= self.len:
+                self.playing = False
+                self.count = 0;
+        return value
+
+class Trigger:
+    def __init__(self, len):
+        pass
+
+class Delay:
+    def __init__(self, node, len):
+        self.node = node
+        self.len = len
+        self.buffer = [0.0] * len
+        self.txrx = 0
+    def get_sample(self):
+        samp = (self.node.get_sample() + self.buffer[self.txrx]) / 2.0
+        value = self.buffer[self.txrx]
+        self.buffer[self.txrx] = samp
+        self.txrx = (self.txrx + 1) % self.len
+        return value
+
+class Mult:
+    def __init__(self, node=None):
+        self.node = node
+        self.flip = False
+        self.value = 0.0
+    def get_sample(self):
+        if self.flip == True:
+            self.value = self.node.get_sample()
+        else:
+            pass
+        self.flip = not self.flip
+        return self.value
+
 
 # rand = Random(48000, 500, 100)
 # op = Random(48000, 1, 0.5)
@@ -179,20 +251,37 @@ class LinToExp:
 # grh = VCO(300.0, 1, fmct=[ctl, rfreq, am])
 # env = Mixer([grh], amp)
 
-saw = Saw(48000, -1.0, 1.0)
+# ctl = VCO(0.1, 10000, 11000)
+rnc = Random(4000)
+att = Atten(rnc, 20000.0, 20000.1)
+saw = Saw(1, -1.0, 1.0, fmct=[att])
+en = Envelope(1.3)
+conv = LinToExp(en, 1000.0)
 # log = Random(4800)
 #
 #
 # con = LinToLog(log, 1.0)
-env = LinToExp(saw, 1000000.0)
+env = LinToExp(saw, 10.0)
 
-osc = VCO(freq=200, gainct=env)
 
+osc = VCO(freq=200, gainct=conv, fmct=[VCO(freq=0.254, gain=150.0, offset=200.0), Atten(Random(100000), 100.0, 200.0), VCO(freq=220, fmct=[Random(10000)])])
+
+# graph_node(ctl, 48000 * 1)
+# graph_node(saw, 48000 * 1)
 # graph_node(env, 48000 * 3)
-# graph_node(saw, 48000 * 3)
+en.trigger()
+# graph_node(conv, 48000 * 1)
 
-gt = GlobalTransport([osc])
+mult = Mult(osc)
+dly = Delay(mult, 10000)
+
+
+gt = GlobalTransport([mult, dly])
 gt.start()
+
+while True:
+    input('enter: ')
+    en.trigger()
 
 #
 #
