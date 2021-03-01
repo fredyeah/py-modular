@@ -53,6 +53,10 @@ class VCO:
         self.gainct = gainct
         self.fmct = fmct
         self.lastp = 0.0
+
+        self.phi = 0.0
+        self.f0 = freq
+        self.f1 = freq
     def pitch_to(self, freq):
         self.freq = freq
     def gain_to(self, gain):
@@ -69,45 +73,36 @@ class VCO:
         #
         # period = freq(samples/second)
     def get_sample(self):
-        # def sweep(f_start, f_end, interval, n_steps):
-        # for i in range(n_steps):
-        #     delta = i / float(n_steps)
-        #     t = interval * delta
-        #     phase = 2 * pi * t * (f_start + (f_end - f_start) * delta / 2)
-        #     print t, phase * 180 / pi, 3 * sin(phase)
-        # delta = self.count
-        # t = 1/48000 * delta
-        # phase = 2 * math.pi * t * (self.freq + (new_freq - self.freq) * delta / 2)
-        # fmcv = 0.0
-        # theta = 0.0
-        # fct = 1.0
-        # phase = 0.0
-        # nfreq = 1.0
+        # new_freq = 0.0
         # if not self.freqct == None:
-        #     phase = self.freqct.get_phase()
-        #     nfreq = self.freqct.get_sample()
-        # if not self.fmct == None:
-        #     for fm in self.fmct:
-        #         fmcv = fmcv + fm.get_sample()
-        # if not self.gainct == None:
-        #     gaincv = self.gainct.get_sample()
-        #     self.gain_to(gaincv)
-        # # p_1 = p_0 + 2*pi*t*(f_0-f_1)
-        # pos = (self.count + 1) / self.fs
-        # acphase = phase + 2 * math.pi * pos * (nfreq - self.freq)
-        # value = math.sin(acphase + fct * self.freq * 2.0 * math.pi * pos)
-        # value = value * self.gain + self.offset
-        # self.count = (self.count + 1)
+        #     new_freq = self.freqct.get_sample()
+        # value = math.sin((self.freq + 1000 * new_freq) * 2.0 * math.pi * (self.count / self.fs) - self.freqct.get_phase() * 2 * math.pi)
+        # self.count = self.count + 1
         # return value
-        new_freq = self.freqct.get_sample()
-        pos = self.count / self.fs
-        value = 2 * math.pi * pos * (self.freq + (new_freq - self.freq) * (self.count / 2) / 2)
-        value = math.sin(self.freq * 2.0 * math.pi * (new_freq))
-        # value = math.sin(value)
-        # print(self.freq, new_freq)
-        # self.freq = new_freq
-        self.count = self.count + 1
-        return value
+        self.f1 = self.freq * self.freqct.get_sample()
+        interval = 1.0 / 48000.0
+        delta = 2 * math.pi * self.freq / self.fs
+        f_delta = (self.f1 - self.f0) / (self.fs * interval)
+        self.phi = self.phi + delta
+        # self.freq = self.freq + f_delta
+        # delta = 2 * math.pi * f / self.fs
+        self.f0 = self.f1
+        output = math.sin(self.freq * 2.0 * math.pi * self.phi)
+        return output
+
+
+# phi = 0;                      // phase accumulator
+# f = f0;                       // initial frequency
+# delta = 2 * pi * f / Fs;      // phase increment per sample
+# f_delta = (f1 - f0) / (Fs * T_sweep);
+#                               // instantaneous frequency increment per sample
+# for each sample
+#     output = A * sin(phi);    // output sample value for current sample
+#     phi += delta;             // increment phase accumulator
+#     f += f_delta;             // increment instantaneous frequency
+#     delta = 2 * pi * f / Fs;  // re-calculate phase increment
+
+
 
 # math.sin(theta + self.freq * 2.0 * math.pi * pos) = sin(theta)cos(2pixf) + cos(theta)sin(2pixf)
 # sin(theta)cos(2pixf) = cos(theta)sin(2pixf)
@@ -127,6 +122,7 @@ class Saw:
         self.freqct = freqct
         self.gainct = gainct
         self.fmct = fmct
+        self.fmcv = 0.0
     def pitch_to(self, freq):
         self.freq = float(48000/freq)
     def gain_to(self, gain):
@@ -136,16 +132,15 @@ class Saw:
         # position = samp_counter / freq(samples/second)
         #
         # period = freq(samples/second)
-        return (self.count + 1) / self.fs
+        return math.atan(math.tan(self.freq * math.pi * (self.count + 1) / self.fs)) * 2 / math.pi
     def get_sample(self):
         if not self.freqct == None:
             self.pitch_to(self.freqct.get_sample())
-        fmcv = 0.0
         if not self.fmct == None:
             for fm in self.fmct:
-                fmcv = fmcv + fm.get_sample()
-        pos = (self.count + 1) / self.fs
-        value = math.atan(math.tan(self.freq * math.pi * pos + fmcv)) * 2 / math.pi
+                self.fmcv = (self.fmcv + ((fm.get_sample() * 0.5 + 0.5) * 0.0002))
+        pos = (self.count) / self.fs
+        value = math.atan(math.tan(self.freq * math.pi * pos + 0.5 * math.pi + 2 * math.pi * self.fmcv)) * 2 / math.pi
         value = value * self.gain + self.offset
         self.count = (self.count + 1)
         return value
@@ -160,6 +155,7 @@ class Sine:
         self.freqct = freqct
         self.gainct = gainct
         self.fmct = fmct
+        self.fmcv = 0.0
     def pitch_to(self, freq):
         self.freq = float(48000/freq)
     def gain_to(self, gain):
@@ -167,17 +163,25 @@ class Sine:
     def get_phase(self):
         return (self.count + 1) / self.fs
     def get_sample(self):
-        if not self.freqct == None:
-            self.pitch_to(self.freqct.get_sample())
-        fmcv = 0.0
+        # if not self.freqct == None:
+        #     self.pitch_to(self.freqct.get_sample())
+        if not self.gainct == None:
+            self.gain_to(self.gainct.get_sample())
         if not self.fmct == None:
             for fm in self.fmct:
-                fmcv = fmcv + fm.get_sample()
-        pos = (self.count + 1) / self.fs
-        value = math.sin(self.freq * 2 * math.pi * pos + fmcv)
+                self.fmcv = (self.fmcv + ((fm.get_sample() * 0.5 + 0.5) * 0.0002))
+        phi = 1.0
+        if not self.freqct == None:
+            phi = self.freqct.get_sample()
+        pos = self.count / self.fs
+        value = math.sin(self.freq * 2 * math.pi * pos + 2 * math.pi * self.fmcv)
         value = value * self.gain + self.offset
-        self.count = (self.count + 1)
+        self.count = self.count + 1
         return value
+
+# value = math.sin(f * 2pi * pos)
+# arcsin(value - p) = f * 2pi * pos
+# 2pi * pos * arcsin(value) = f
 
 class Random:
     def __init__(self, freq):
@@ -303,13 +307,14 @@ class Trigger:
         pass
 
 class Delay:
-    def __init__(self, node, len):
+    def __init__(self, node, len, fb):
         self.node = node
         self.len = len
         self.buffer = [0.0] * len
         self.txrx = 0
+        self.fb = fb
     def get_sample(self):
-        samp = (self.node.get_sample() + self.buffer[self.txrx] * 1.5) / 1.55
+        samp = (self.node.get_sample() + self.buffer[self.txrx] * self.fb) / 1.5
         value = self.buffer[self.txrx]
         self.buffer[self.txrx] = samp
         self.txrx = (self.txrx + 1) % self.len
@@ -358,22 +363,22 @@ osc = VCO(freq=300, gainct=conv, fmct=[
         VCO(freq=220, fmct=[Random(10000)])
     ])
 
-en.trigger()
-# graph_node(conv, 48000 * 1)
-
-mult = Mult(osc)
-dly = Delay(Delay(Delay(mult, 309), 798), 120)
-
-master = Mixer([mult, dly])
-COEF = 0.12
-
-
-pitch = Envelope(1)
-penv = LinToExp(pitch, 10000.0)
-fenv = Atten(penv, gain=1000, offset=1001)
-pitch.trigger()
-
-ctl = Mult(fenv)
+# en.trigger()
+# # graph_node(conv, 48000 * 1)
+#
+# mult = Mult(osc)
+# # dly = Delay(Delay(Delay(mult, 309), 798), 120)
+#
+# master = Mixer([mult, dly])
+# COEF = 0.12
+#
+#
+# pitch = Envelope(1)
+# penv = LinToExp(pitch, 10000.0)
+# fenv = Atten(penv, gain=1000, offset=1001)
+# pitch.trigger()
+#
+# ctl = Mult(fenv)
 
 # kick = VCO(freq=0,
 #     # gainct=LinToExp(
@@ -383,7 +388,7 @@ ctl = Mult(fenv)
 #     freqct=ctl
 # )
 
-fil = Filter(Filter(Filter(Filter(Saw(freq=7), COEF), COEF), COEF), COEF)
+# fil = Filter(Filter(Filter(Filter(Saw(freq=7), COEF), COEF), COEF), COEF)
 
 integrator = VCO(freq=10,
     freqct=Saw(freq=2.34)
@@ -444,8 +449,25 @@ class Sweep:
 
 # sweep(1, 10, 5, 1000)
 
-graph_node(Sine(freq=10.0), 48000 * 2)
-graph_node(Sweep(freqct=Sine(freq=1.0)), 48000 * 2)
+# graph_node(VCO(freq=10.0), 48000)
+# graph_node(Saw(freq=1.0), 48000)
+# graph_node(VCO(freq=5.0, freqct=Saw(freq=100.0)), 48000 * 3)
+
+# graph_node(Sine(freq=10.0, fmct=[Saw(freq=3.0)]), 48000)
+# graph_node(Saw(freq=1.0, gain=1.0, offset=1.0), 48000 * 3)
+# graph_node(Sine(freq=1.0, fmct=[Saw(freq=1.0, gain=0.5, offset=0.5)]), 48000 * 3)
+
+# graph_node(Saw(freq=10.0, fmct=[Saw(freq=1.0)]), 48000 * 2)
+
+# graph_node(Sine(freq=10.0), 48000 * 2)
+# graph_node(Sweep(freqct=Sine(freq=1.0)), 48000 * 2)
+
+# graph_node(Saw(freq=2.4, gain=10.0), 48000)
+# graph_node(LinToExp(Saw(freq=2.4, gain=1.0), 10.0), 48000)
+# graph_node(Atten(LinToLog(Saw(freq=2.4, gain=1.0), 10.0), gain=20.0, offset=-10.0), 48000)
+# graph_node(Sine(freq=50.0, fmct=[Atten(LinToExp(Saw(freq=2.4, gain=1.0), 10.0), gain=20.0, offset=-10.0)]), 48000)
+
+# graph_node(Sine(freq=50.0, gainct=LinToExp(Saw(freq=0.5, gain=-1.0), 10.0), fmct=[Atten(LinToExp(Saw(freq=0.5, gain=-1.0), 1000.0), gain=50.0, offset=-10.0)]), 48000 * 2)
 
 # NOTE: value at sample n = sin(2 * pi * (n / fs) * f(in Hz))
 # NOTE: phase at sample n = 2 * pi * (n / fs) * f(in Hz)
@@ -453,10 +475,16 @@ graph_node(Sweep(freqct=Sine(freq=1.0)), 48000 * 2)
 
 # record_file(integrator, 3)
 
+vari = Mult(Random(100000))
 
+# graph_node(vari, 48000 * 10)
+
+kick = Sine(freq=100.0, gainct=LinToExp(Saw(freq=0.4, gain=-1.0, fmct=[Atten(vari, gain=10.0, offset = 100.0)]), 10.0), fmct=[Atten(LinToExp(Saw(freq=0.4, gain=-1.0, fmct=[Atten(vari, gain=10.0, offset = 100.0)]), 1000.0), gain=30.0, offset=-10.0)])
 #
-# tp = GlobalTransport([integrator])
-# tp.start()
+dly = Delay(Filter(kick, 0.02), 10000, 0.9)
+
+tp = GlobalTransport([Filter(dly, 0.02)])
+tp.start()
 
 
 
