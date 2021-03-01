@@ -487,9 +487,11 @@ class Sweep:
 # tp.start()
 
 tp = GlobalTransport([
-    Saw(freq=79.0, fmct=[
-        Sine(freq=10.0, gain=100.0)
-    ])
+    Delay(
+        Sine(freq=179.0, fmct=[
+            Saw(freq=100.0, gain=100.0), Saw(freq=0.32, gain=1000.0)
+        ]), 10000, 0.8
+    )
 ])
 
 tp.start()
