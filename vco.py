@@ -169,7 +169,7 @@ class Sine:
             self.gain_to(self.gainct.get_sample())
         if not self.fmct == None:
             for fm in self.fmct:
-                self.fmcv = (self.fmcv + ((fm.get_sample() * 0.5 + 0.5) * 0.0002))
+                self.fmcv = (self.fmcv + ((fm.get_sample()) * 0.00001))
         phi = 1.0
         if not self.freqct == None:
             phi = self.freqct.get_sample()
@@ -475,15 +475,23 @@ class Sweep:
 
 # record_file(integrator, 3)
 
-vari = Mult(Random(100000))
-
-# graph_node(vari, 48000 * 10)
-
-kick = Sine(freq=100.0, gainct=LinToExp(Saw(freq=0.4, gain=-1.0, fmct=[Atten(vari, gain=10.0, offset = 100.0)]), 10.0), fmct=[Atten(LinToExp(Saw(freq=0.4, gain=-1.0, fmct=[Atten(vari, gain=10.0, offset = 100.0)]), 1000.0), gain=30.0, offset=-10.0)])
+# vari = Mult(Random(100000))
 #
-dly = Delay(Filter(kick, 0.02), 10000, 0.9)
+# # graph_node(vari, 48000 * 10)
+#
+# kick = Sine(freq=100.0, gainct=LinToExp(Saw(freq=0.4, gain=-1.0, fmct=[Atten(vari, gain=10.0, offset = 100.0)]), 10.0), fmct=[Atten(LinToExp(Saw(freq=0.4, gain=-1.0, fmct=[Atten(vari, gain=10.0, offset = 100.0)]), 1000.0), gain=30.0, offset=-10.0)])
+# #
+# dly = Delay(Filter(kick, 0.02), 10000, 0.9)
+#
+# tp = GlobalTransport([Filter(dly, 0.02)])
+# tp.start()
 
-tp = GlobalTransport([Filter(dly, 0.02)])
+tp = GlobalTransport([
+    Sine(freq=79.0, fmct=[
+        Saw(freq=1000.0, gain=100.0)
+    ])
+])
+
 tp.start()
 
 
