@@ -488,7 +488,7 @@ class Sweep:
 
 tp = GlobalTransport([
     Saw(freq=79.0, fmct=[
-        Saw(freq=200.0, gain=1000.0)
+        Sine(freq=10.0, gain=100.0)
     ])
 ])
 
