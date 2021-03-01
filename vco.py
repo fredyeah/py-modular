@@ -138,7 +138,7 @@ class Saw:
             self.pitch_to(self.freqct.get_sample())
         if not self.fmct == None:
             for fm in self.fmct:
-                self.fmcv = (self.fmcv + ((fm.get_sample() * 0.5 + 0.5) * 0.0002))
+                self.fmcv = (self.fmcv + ((fm.get_sample()) * 0.00001))
         pos = (self.count) / self.fs
         value = math.atan(math.tan(self.freq * math.pi * pos + 0.5 * math.pi + 2 * math.pi * self.fmcv)) * 2 / math.pi
         value = value * self.gain + self.offset
@@ -487,8 +487,8 @@ class Sweep:
 # tp.start()
 
 tp = GlobalTransport([
-    Sine(freq=79.0, fmct=[
-        Saw(freq=1000.0, gain=100.0)
+    Saw(freq=79.0, fmct=[
+        Saw(freq=200.0, gain=1000.0)
     ])
 ])
 
