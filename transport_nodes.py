@@ -13,25 +13,33 @@ class GlobalTransport:
     def add_node(self, node):
         self.nodes.append(node)
     def get_block(self):
-        self.buffer = []
-        for i in range(self.buffer_len):
-            sample = 0
-            for handler in self.node_handlers:
-                sample = handler.sample_callback(self.count) + sample
-            sample = sample / len(self.node_handlers)
-            for handler in self.event_handlers:
-                handler.sample_callback(self.count)
-            self.buffer.append(sample)
-            self.count = self.count + 1
+        self.buffer = [[],[]]
+        oc = self.count
+        for i in range(2):
+            self.count = oc
+            for s in range(int(self.buffer_len)):
+                sample = 0
+                for handler in self.node_handlers[i]:
+                    sample = handler.sample_callback(self.count) + sample
+                try:
+                    sample = sample / len(self.node_handlers[i])
+                except:
+                    pass
+                for handler in self.event_handlers[i]:
+                    handler.sample_callback(self.count)
+                self.buffer[i].append(sample)
+                self.count = self.count + 1
         return self.buffer
     def buffer_cb(self, indata, outdata, frames, time, status):
         block = self.get_block()
-        arry = np.array(block).reshape((self.buffer_len, 1))
-        outdata[:] = arry
+        ch_num = 2
+        for ch in range(ch_num):
+            chan = np.array(block[ch]).reshape(self.buffer_len)
+            outdata[:, ch] = chan
     def begin_thread(self):
         while True:
-            with sd.Stream(channels=1, samplerate=48000, blocksize=self.buffer_len, callback=self.buffer_cb):
-                sd.sleep(int((48000 / self.buffer_len) * 1000))
+            with sd.Stream(channels=2, samplerate=48000, blocksize=self.buffer_len, callback=self.buffer_cb):
+                sd.sleep(1000 * 60 * 60 * 24)
     def start(self):
         threading.Thread(target=self.begin_thread).start()
 
