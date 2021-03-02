@@ -10,7 +10,7 @@ def graph_node_lin(node, samples):
         time.append(i)
     plot.plot(time, samps)
     plot.title('wave')
-    # plot.yscale('log')
+    # plot.figure(figsize=(10, 1))
     plot.xlabel('sample')
     plot.ylabel('amplitude')
     plot.grid(True, which='both')

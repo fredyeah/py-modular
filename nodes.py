@@ -11,36 +11,6 @@ from transport_nodes import *
 BUFFER_SIZE = 2048
 TEST_FILE = []
 
-class LinToLog:
-    def __init__(self, node, amp=1.0, offset=0.0):
-        self.node = node
-        self.amp = amp
-        self.offset = offset
-    def get_sample(self):
-        val = self.node.get_sample()
-        if val < 0.000001:
-            val = 0.000001
-        if val > 1:
-            val = 1
-        val = (10 * math.log10(val+0.0) + 60.0) / 60.0
-        return val
-
-class LinToExp:
-    def __init__(self, node, amp=1.0, offset=0.0):
-        self.node = node
-        self.amp = amp * 10.0
-        self.offset = offset
-    def amp_to(self, amp):
-        self.amp = amp
-    def get_sample(self):
-        val = self.node.get_sample()
-        if val < 0.000001:
-            val = 0.000001
-        if val > 1:
-            val = 1
-        val = (math.pow(self.amp, val) - 1) / (0.9 * self.amp)
-        return val
-
 class Envelope:
     def __init__(self, len, gatect=None):
         self.len = 48000.0 / len
@@ -71,8 +41,8 @@ class Delay:
         self.buffer = [0.0] * len
         self.txrx = 0
         self.fb = fb
-    def get_sample(self):
-        samp = (self.node.get_sample() + self.buffer[self.txrx] * self.fb) / 1.5
+    def get_sample(self, time):
+        samp = (self.node.get_sample(time) + self.buffer[self.txrx] * self.fb) / 1.5
         value = self.buffer[self.txrx]
         self.buffer[self.txrx] = samp
         self.txrx = (self.txrx + 1) % self.len
@@ -127,5 +97,15 @@ class Transient:
         self.count = self.count + 1
         return 3 * math.sin(g_t)
 
+# record_file(Random(2000, gainct=Atten(LinToExp(Saw(freq=1.0, gain=-1.0), curve_gain=0.93), gain=0.5, offset=0.5)), seconds=10)
+
+# GlobalTransport([
+#     Delay(Random(2000, gainct=Atten(LinToExp(Saw(freq=1.0, gain=-1.0), curve_gain=0.93), gain=0.5, offset=0.5)), 3000, 1.2)
+# ]).start()
+
+# node = Saw(freq=4.0)
+# node = LinToExp(Saw(freq=15.0, gain=-1.0), curve_gain=1.0)
+#
+# graph_node_lin(node, 48000)
 # graph_node(Square(freq=20, pwmct=Saw(freq=1)), 48000)
-GlobalTransport([Square(freq=240, pwmct=Sine(freq=1, fmct=[Random(freq=0.26, gain=20.0)]))]).start()
+# GlobalTransport([Square(freq=240, pwmct=Sine(freq=1, fmct=[Random(freq=0.26, gain=20.0)]))]).start()
