@@ -7,6 +7,7 @@ from debug_utils import *
 from osc_nodes import *
 from mixer_nodes import *
 from transport_nodes import *
+from event_nodes import *
 
 BUFFER_SIZE = 2048
 TEST_FILE = []
@@ -48,19 +49,6 @@ class Delay:
         self.txrx = (self.txrx + 1) % self.len
         return value
 
-class Mult:
-    def __init__(self, node=None):
-        self.node = node
-        self.flip = False
-        self.value = 0.0
-    def get_sample(self):
-        if self.flip == True:
-            self.value = self.node.get_sample()
-        else:
-            pass
-        self.flip = not self.flip
-        return self.value
-
 class Filter:
     def __init__(self, node, coef=0.0):
         self.node = node
@@ -96,6 +84,16 @@ class Transient:
         g_t = a * math.exp(b * t)
         self.count = self.count + 1
         return 3 * math.sin(g_t)
+
+mo = Sine(125.0)
+no = Saw(400.0)
+pe = PitchEvent([mo, no], 100000)
+
+eh = EventHandler([pe])
+nh = NodeHandler([Mixer([no, mo], gainct=Random(freq=1, gain=0.8))])
+rev = NodeHandler([Delay(Mixer([no, mo], gainct=Random(1)), 10000, 1.2)])
+
+GlobalTransport([nh, rev], [eh]).start()
 
 # record_file(Random(2000, gainct=Atten(LinToExp(Saw(freq=1.0, gain=-1.0), curve_gain=0.93), gain=0.5, offset=0.5)), seconds=10)
 
