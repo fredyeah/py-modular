@@ -52,6 +52,7 @@ class EventHandler:
         self.events = events
         self.fs = fs
     def sample_callback(self, sample):
+        t = sample / self.fs
         for event in self.events:
             if sample % event.sample_freq == 0:
-                event.get_event()
+                event.get_event(t)

@@ -8,28 +8,29 @@ from osc_nodes import *
 from mixer_nodes import *
 from transport_nodes import *
 from event_nodes import *
+from env_nodes import *
 
 BUFFER_SIZE = 2048
 TEST_FILE = []
 
-class Envelope:
-    def __init__(self, len, gatect=None):
-        self.len = 48000.0 / len
-        self.count = 0
-        self.step = 1 / self.len
-        self.playing = False
-        self.gatect = gatect
-    def trigger(self):
-        self.playing = True
-    def get_sample(self):
-        value = 0.0
-        if self.playing == True:
-            value = 1 - self.count * self.step
-            self.count = self.count + 1
-            if self.count >= self.len:
-                self.playing = False
-                self.count = 0;
-        return value
+# class Envelope:
+#     def __init__(self, len, gatect=None):
+#         self.len = 48000.0 / len
+#         self.count = 0
+#         self.step = 1 / self.len
+#         self.playing = False
+#         self.gatect = gatect
+#     def trigger(self):
+#         self.playing = True
+#     def get_sample(self):
+#         value = 0.0
+#         if self.playing == True:
+#             value = 1 - self.count * self.step
+#             self.count = self.count + 1
+#             if self.count >= self.len:
+#                 self.playing = False
+#                 self.count = 0;
+#         return value
 
 class Trigger:
     def __init__(self, len):
@@ -54,8 +55,8 @@ class Filter:
         self.node = node
         self.coef = coef
         self.out_data = 0.0
-    def get_sample(self):
-        in_data = self.node.get_sample()
+    def get_sample(self, time):
+        in_data = self.node.get_sample(time)
         self.out_data = self.out_data - (self.coef * (self.out_data - in_data))
         return self.out_data
 
@@ -85,15 +86,30 @@ class Transient:
         self.count = self.count + 1
         return 3 * math.sin(g_t)
 
-mo = Sine(125.0)
-no = Saw(400.0)
-pe = PitchEvent([mo, no], 100000)
+env = ExpEnv(len=1.3, curve_gain=0.8)
+mo = Sine(125.0, gainct=env)
+ctl = Saw(0.2)
 
-eh = EventHandler([pe])
-nh = NodeHandler([Mixer([no, mo], gainct=Random(freq=1, gain=0.8))])
-rev = NodeHandler([Delay(Mixer([no, mo], gainct=Random(1)), 10000, 1.2)])
+# env.trigger(0.0)
+# graph_node_lin(env, 48000)
+# graph_node_lin(mo, 48000)
 
-GlobalTransport([nh, rev], [eh]).start()
+
+# shape = Atten(LinToExp(env, -0.7), gain=-0.5, offset=0.5)
+
+# graph_node_lin(shape, 48000)
+
+pe = PitchEvent([mo], 100000)
+te = TriggerEvent([env], 48000)
+
+eh = EventHandler([pe, te])
+nh = NodeHandler([Mixer([mo])])
+
+# graph_node_lin(LinToExp(Saw(1.0), 0.5), 48000)
+
+gt = GlobalTransport([nh], [eh]).start()
+#
+# graph_transport(gt, 48000)
 
 # record_file(Random(2000, gainct=Atten(LinToExp(Saw(freq=1.0, gain=-1.0), curve_gain=0.93), gain=0.5, offset=0.5)), seconds=10)
 

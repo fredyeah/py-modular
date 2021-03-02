@@ -1,5 +1,6 @@
 import random
 import math
+from master_class import *
 
 class Oscillator:
     def __init__(self, freq=100.0, gain=1.0, offset=0.0, gainct=None, fmct=None):
