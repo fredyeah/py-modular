@@ -56,3 +56,20 @@ class EventHandler:
         for event in self.events:
             if sample % event.sample_freq == 0:
                 event.get_event(t)
+
+class EventSequencer:
+    def __init__(self, events, fs=48000.0, sequence=[]):
+        self.events = events
+        self.fs = fs
+        self.count = 0
+        self.pos = 0
+        self.sequence = sequence
+    def sample_callback(self, sample):
+        t = sample / self.fs
+        if self.count == self.sequence[self.pos]:
+            self.pos = self.pos + 1
+            self.pos = self.pos % len(self.sequence)
+            self.count = 0
+            for event in self.events:
+                event.get_event(t)
+        self.count = self.count + 1

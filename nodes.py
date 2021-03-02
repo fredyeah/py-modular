@@ -86,40 +86,21 @@ class Transient:
         self.count = self.count + 1
         return 3 * math.sin(g_t)
 
+
 env = ExpEnv(len=1.3, curve_gain=0.8)
+amb = ExpEnv(len=0.8, curve_gain=0.5)
 mo = Sine(125.0, gainct=env)
-ctl = Saw(0.2)
-
-# env.trigger(0.0)
-# graph_node_lin(env, 48000)
-# graph_node_lin(mo, 48000)
-
-
-# shape = Atten(LinToExp(env, -0.7), gain=-0.5, offset=0.5)
-
-# graph_node_lin(shape, 48000)
+ctl = Sine(59, fmct=[Atten(amb, gain=10.0)])
 
 pe = PitchEvent([mo], 100000)
-te = TriggerEvent([env], 48000)
+te = TriggerEvent([env])
+slope = TriggerEvent([amb])
 
-eh = EventHandler([pe, te])
-nh = NodeHandler([Mixer([mo])])
+ag = EventSequencer([slope], sequence=[
+    40000
+])
+seq = EventSequencer([te], sequence=[48000])
+eh = EventHandler([te])
+nh = NodeHandler([Mixer([mo, ctl])])
 
-# graph_node_lin(LinToExp(Saw(1.0), 0.5), 48000)
-
-gt = GlobalTransport([nh], [eh]).start()
-#
-# graph_transport(gt, 48000)
-
-# record_file(Random(2000, gainct=Atten(LinToExp(Saw(freq=1.0, gain=-1.0), curve_gain=0.93), gain=0.5, offset=0.5)), seconds=10)
-
-# GlobalTransport([
-#     Delay(Random(2000, gainct=Atten(LinToExp(Saw(freq=1.0, gain=-1.0), curve_gain=0.93), gain=0.5, offset=0.5)), 3000, 1.2)
-# ]).start()
-
-# node = Saw(freq=4.0)
-# node = LinToExp(Saw(freq=15.0, gain=-1.0), curve_gain=1.0)
-#
-# graph_node_lin(node, 48000)
-# graph_node(Square(freq=20, pwmct=Saw(freq=1)), 48000)
-# GlobalTransport([Square(freq=240, pwmct=Sine(freq=1, fmct=[Random(freq=0.26, gain=20.0)]))]).start()
+gt = GlobalTransport([nh], [seq, ag]).start()
