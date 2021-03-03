@@ -44,3 +44,17 @@ class LinToExp:
         s = self.node.get_sample(time) * 0.5 + 0.5
         value = math.pow(s, self.curve_gain) - 0.5
         return value * 2.0
+
+class Panner:
+    def __init__(self, node, pos=1.0, posct=None):
+        self.node = node
+        self.pos = pos
+        self.posct = posct
+        self.lch = Atten(node, gain=self.pos)
+        self.rch = Atten(node, gain=(1.0 - self.pos))
+    def get_sample(self, time):
+        if not self.posct == None:
+            self.pos = self.posct.get_sample(time) * 0.5 + 0.5
+            self.lch.gain = self.pos
+            self.rch.gain = 1.0 - self.pos
+        return 0.0

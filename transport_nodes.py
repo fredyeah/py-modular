@@ -1,58 +1,21 @@
 import threading
 import sounddevice as sd
 import numpy as np
+import time
 
-class GlobalTransport:
-    def __init__(self, node_handlers, event_handlers, buffer_len=1024, fs=48000.0):
-        self.buffer_len = buffer_len
-        self.node_handlers = node_handlers
-        self.event_handlers = event_handlers
-        self.count = 0;
-        self.buffer = []
+class NodeHandler:
+    def __init__(self, nodes=[], fs=48000.0):
+        self.nodes = nodes
         self.fs = fs
     def add_node(self, node):
         self.nodes.append(node)
-    def get_block(self):
-        self.buffer = [[],[]]
-        oc = self.count
-        for i in range(2):
-            self.count = oc
-            for s in range(int(self.buffer_len)):
-                sample = 0
-                for handler in self.node_handlers[i]:
-                    sample = handler.sample_callback(self.count) + sample
-                try:
-                    sample = sample / len(self.node_handlers[i])
-                except:
-                    pass
-                for handler in self.event_handlers[i]:
-                    handler.sample_callback(self.count)
-                self.buffer[i].append(sample)
-                self.count = self.count + 1
-        return self.buffer
-    def buffer_cb(self, indata, outdata, frames, time, status):
-        block = self.get_block()
-        ch_num = 2
-        for ch in range(ch_num):
-            chan = np.array(block[ch]).reshape(self.buffer_len)
-            outdata[:, ch] = chan
-    def begin_thread(self):
-        while True:
-            with sd.Stream(channels=2, samplerate=48000, blocksize=self.buffer_len, callback=self.buffer_cb):
-                sd.sleep(1000 * 60 * 60 * 24)
-    def start(self):
-        threading.Thread(target=self.begin_thread).start()
-
-class NodeHandler:
-    def __init__(self, nodes, fs=48000.0):
-        self.nodes = nodes
-        self.fs = fs
     def sample_callback(self, sample):
         t = sample / self.fs
         sample_value = 0.0
         for node in self.nodes:
             sample_value = node.get_sample(t) + sample_value
-        sample_value = sample_value / len(self.nodes)
+        if len(self.nodes) > 0:
+            sample_value = sample_value / len(self.nodes)
         return sample_value
 
 class EventHandler:
@@ -81,3 +44,42 @@ class EventSequencer:
             for event in self.events:
                 event.get_event(t)
         self.count = self.count + 1
+
+class GlobalTransport:
+    def __init__(self, event_handlers, channels=2, buffer_len=1024, fs=48000.0):
+        sd.default.device = [3, 3]
+        print(sd.default.device)
+        self.buffer_len = buffer_len
+        self.event_handlers = event_handlers
+        self.count = 0;
+        self.block = []
+        for i in range(self.buffer_len):
+            self.block.append([0.0] * channels)
+        self.channels = channels
+        self.chs = []
+        for i in range(channels):
+            self.chs.append(NodeHandler([]))
+        self.fs = fs
+    def add_node(self, node):
+        self.nodes.append(node)
+    def get_block(self):
+        # t = time.perf_counter()
+        self.block = []
+        for s in range(self.buffer_len):
+            sample = []
+            for ch in self.chs:
+                sample.append(ch.sample_callback(self.count))
+            for handler in self.event_handlers:
+                handler.sample_callback(self.count)
+            self.count = self.count + 1
+            self.block.append(sample)
+        # print(time.perf_counter() - t)
+    def buffer_cb(self, indata, outdata, frames, time, status):
+        outdata[:] = self.block
+        self.get_block()
+    def begin_thread(self):
+        while True:
+            with sd.Stream(channels=self.channels, samplerate=48000, blocksize=self.buffer_len, callback=self.buffer_cb):
+                sd.sleep(1000 * 60 * 60 * 24)
+    def start(self):
+        threading.Thread(target=self.begin_thread).start()

@@ -1,5 +1,6 @@
 import soundfile as sf
 import matplotlib.pyplot as plot
+import numpy as np
 
 def graph_node_lin(node, samples):
     time = []
@@ -55,4 +56,11 @@ def record_file(node, filename='recorded_wave.wav', seconds=5):
     for i in range(48000 * seconds):
         samp = node.get_sample(i / 48000.0) / 10.0
         buffer.append(samp)
+    sf.write(filename, buffer, 48000)
+
+def record_transport(tp, filename='recorded_session.wav', seconds=5.0):
+    buffer = [[],[]]
+    blocks = int(seconds * 48000 / 1024)
+    for i in range(blocks):
+        buffer = tp.get_block()
     sf.write(filename, buffer, 48000)

@@ -8,18 +8,63 @@ from event_nodes import *
 from env_nodes import *
 from processing_nodes import *
 from dsp_nodes import *
+from synth_models import *
 
-sq = Square(120.0)
-sw = Saw(120.0)
+sq = Square(1.0)
+sw = Sine(0.4)
 sn = Sine(200.0)
 lim = Lim(sq)
-GlobalTransport([
-    [NodeHandler([lim])],
-    [NodeHandler([sn])]
-], [
-    [],
-    []
-]).start()
+
+
+#
+# fm2 = Sine(freq=300, fmct=[Sine(freq=200, fmct=[Sine(freq=570)])])
+#
+# s = Sine(freq=300, fmct=[Sine(freq=200)])
+#
+# # graph_node_lin(s, 48000)
+#
+# pn = Panner(fm, posct=sn)
+#
+
+
+# d = MultiTapDelay(t, taps=[
+# 400, 5000, 300, 1000, 20000
+# ])
+
+# lchd = Delay([t], 1000, 1.2)
+# rchd = Delay([t], 2000, 1.1)
+#
+# lchd.add_input(rchd)
+# rchd.add_input(lchd)
+
+kick = Sine(freq=60, gainct=Atten(LinToExp(Saw(freq=1, gain=-1.0), 0.8), gain=0.5, offset=0.5), fmct=[
+    Atten(LinToExp(Saw(freq=1, gain=-1.0), 0.9), gain=10, offset=10)
+])
+
+# graph_node_lin(LinToExp(Saw(freq=1)), 48000)
+
+fm = FMSynth()
+fm.op1.freq = 570.0
+fm.op2.freq = 209.3
+fm.op1.gain = 190.0
+fm.op2.gain = 30.35
+fm.op3.freq = 300.0
+fm.op3.gainct = Saw(0.4)
+
+t = Sine(freq=200, fmct=[Random(1, gain=100.0)])
+md = MultiChannelDelay([t], [1000, 2000], 1.2)
+
+tp = GlobalTransport([], 2)
+
+# tp.chs[0].add_node(md)
+# tp.chs[0].add_node(fm)
+tp.chs[0].add_node(kick)
+# tp.chs[1].add_node(md)
+tp.chs[1].add_node(kick)
+
+tp.start()
+
+# record_transport(tp, seconds=5.0)
 
 # graph_node_lin(sq, 48000)
 # graph_node_lin(lim, 48000)
