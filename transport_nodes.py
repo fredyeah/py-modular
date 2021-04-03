@@ -48,7 +48,7 @@ class EventSequencer:
 class GlobalTransport:
     def __init__(self, event_handlers, channels=2, buffer_len=1024, fs=48000.0):
         # sd.default.device = [3, 3]
-        print(sd.default.device)
+        # print("default device is: ", sd.default.device)
         self.buffer_len = buffer_len
         self.event_handlers = event_handlers
         self.count = 0;
@@ -66,7 +66,7 @@ class GlobalTransport:
     def add_node(self, node):
         self.nodes.append(node)
     def get_block(self):
-        t = time.perf_counter()
+        # t = time.perf_counter()
         self.block = []
         for s in range(self.buffer_len):
             sample = []
@@ -76,7 +76,7 @@ class GlobalTransport:
                 handler.sample_callback(self.count)
             self.count = self.count + 1
             self.block.append(sample)
-        print(time.perf_counter() - t)
+        # print(time.perf_counter() - t)
     def buffer_cb(self, indata, outdata, frames, timer, status):
         # print(status)
         outdata[:] = self.block

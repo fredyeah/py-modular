@@ -27,8 +27,9 @@ x_test = []
 y_test = []
 
 def make_block():
-    f = random.random() * 5000 + 50
-    t = int(random.random() * 4)
+    f = random.random() * 500 + 50
+    # t = int(random.random() * 4)
+    t = int(0)
     node = None
     if t == 0:
         node = Sine(freq=f)
@@ -44,61 +45,22 @@ def make_block():
     data = tp.block
     return [samp[0] for samp in data]
 
-def make_test_item():
-    f = random.random() * 5000 + 50
-    t = int(random.random() * 4)
-    node = None
-    if t == 0:
-        node = Sine(freq=f)
-    elif t == 1:
-        node = Saw(freq=f)
-    elif t == 2:
-        node = Square(freq=f)
-    elif t == 3:
-        node = Tri(freq=f)
-    tp = GlobalTransport([], 1)
-    tp.chs[0].add_node(node)
-    tp.get_block()
-    data = tp.block
-    samps = [samp[0] for samp in data]
-    x_train.append(samps)
-
-def make_train_item():
-    f = random.random() * 5000 + 50
-    t = int(random.random() * 4)
-    node = None
-    if t == 0:
-        node = Sine(freq=f)
-    elif t == 1:
-        node = Saw(freq=f)
-    elif t == 2:
-        node = Square(freq=f)
-    elif t == 3:
-        node = Tri(freq=f)
-    tp = GlobalTransport([], 1)
-    tp.chs[0].add_node(node)
-    tp.get_block()
-    data = tp.block
-    samps = [samp[0] for samp in data]
-    train_blocks.append(samps)
-    train_types.append(t)
-
-for i in range(10000):
-    make_train_item()
-    print(str(i * 100.0 / 10000.0) + "% done")
-
 for i in range(1000):
-    make_test_item()
+    x_train.append(make_block())
+    y_train.append(make_block())
     print(str(i * 100.0 / 1000.0) + "% done")
 
-x_train = pd.DataFrame(train_blocks)
-y_train = pd.DataFrame(train_types)
+for i in range(10):
+    x_test.append(make_block())
 
-x_test = pd.DataFrame(test_blocks)
-y_test = pd.DataFrame(test_types)
+x_train = pd.DataFrame(x_train)
+y_train = pd.DataFrame(y_train)
 
-x_train.to_csv('~/PycharmProjects/tf_project/x_train.csv', index=False, header=False)
-y_train.to_csv('~/PycharmProjects/tf_project/y_train.csv', index=False, header=False)
+x_test = pd.DataFrame(x_test)
+# y_test = pd.DataFrame(test_types)
 
-x_test.to_csv('~/PycharmProjects/tf_project/x_test.csv', index=False, header=False)
-y_test.to_csv('~/PycharmProjects/tf_project/y_test.csv', index=False, header=False)
+x_train.to_csv('~/PycharmProjects/tf_project/x_train_gen.csv', index=False, header=False)
+y_train.to_csv('~/PycharmProjects/tf_project/y_train_gen.csv', index=False, header=False)
+
+x_test.to_csv('~/PycharmProjects/tf_project/x_test_gen.csv', index=False, header=False)
+# y_test.to_csv('~/PycharmProjects/tf_project/y_test.csv', index=False, header=False)

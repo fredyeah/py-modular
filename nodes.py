@@ -56,12 +56,16 @@ md = MultiChannelDelay([t], [1000, 2000], 1.2)
 
 tp = GlobalTransport([], 2)
 
-tp.chs[0].add_node(t)
+
+
+
+
+# tp.chs[0].add_node(t)
 # tp.chs[0].add_node(md)
 # tp.chs[1].add_node(md)
 # tp.chs[2].add_node(fm)
 # tp.chs[0].add_node(kick)
-tp.chs[1].add_node(t)
+# tp.chs[1].add_node(t)
 # tp.chs[2].add_node(t)
 # tp.chs[3].add_node(t)
 # tp.chs[4].add_node(t)
