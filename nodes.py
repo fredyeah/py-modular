@@ -1,5 +1,3 @@
-
-
 from debug_utils import *
 from osc_nodes import *
 from mixer_nodes import *
@@ -60,11 +58,14 @@ tp = GlobalTransport([], 2)
 
 
 
-# tp.chs[0].add_node(t)
+tp.chs[0].add_node(t)
+tp.chs[1].add_node(t)
+tp.chs[0].add_node(md)
+tp.chs[1].add_node(md)
 # tp.chs[0].add_node(md)
 # tp.chs[1].add_node(md)
 # tp.chs[2].add_node(fm)
-# tp.chs[0].add_node(kick)
+tp.chs[0].add_node(kick)
 # tp.chs[1].add_node(t)
 # tp.chs[2].add_node(t)
 # tp.chs[3].add_node(t)

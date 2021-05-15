@@ -47,8 +47,8 @@ class EventSequencer:
 
 class GlobalTransport:
     def __init__(self, event_handlers, channels=2, buffer_len=1024, fs=48000.0):
-        # sd.default.device = [3, 3]
-        # print("default device is: ", sd.default.device)
+        sd.default.device = [15, 15]
+        print("default device is: ", sd.default.device)
         self.buffer_len = buffer_len
         self.event_handlers = event_handlers
         self.count = 0;
