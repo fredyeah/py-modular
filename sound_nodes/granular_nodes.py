@@ -1,10 +1,12 @@
 
 
 class GranBase:
-    def __init__(self, grains, freq=0.8, gain=1.0, offset=0.0, gainct=None):
+    def __init__(self, grains, freq=50.0, gain=1.0, offset=0.0, gainct=None):
         self.grains = grains
         self.num_grains = len(grains)
         self.current_grain = 0
+        self.playing_grains = [0]
+        self.grain_positions = [0] * self.num_grains
         self.freq = float(freq)
         self.freq_in_seconds = 1.0 / self.freq
         self.time = 0.0
@@ -16,8 +18,17 @@ class GranBase:
         self.gain = float(gain)
     def fire_grain(self):
         self.current_grain = (self.current_grain + 1) % self.num_grains
-        print(self.current_grain)
+        self.playing_grains.append(self.current_grain)
     def get_pcm_value(self, time):
+        values = []
+        for grain in self.playing_grains:
+            self.grain_positions[grain] = self.grain_positions[grain] + 1
+            if(self.grain_positions[grain] >= len(self.grains[grain])):
+                self.playing_grains.remove(grain)
+                self.grain_positions[grain] = 0
+            values.append(self.grains[grain][self.grain_positions[grain]])
+        if(len(values) > 0):
+            return sum(values) / len(values)
         return 0.0
     def get_sample(self, time):
         if not self.gainct == None:
