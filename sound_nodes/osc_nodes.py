@@ -5,9 +5,21 @@ import math
 # an oscillator will output a wave between -1.0 and 1.0 by default
 # gain and offset linearly scale the output of the oscillator
 # one gain controller can be assigned to an oscillator which will linearly scale the gain
-# one Array of fm controllers can be assigned to an oscillator which will linearly scale the frequency 
+# one Array of fm controllers can be assigned to an oscillator which will linearly scale the frequency
+
+"""
+Basic Oscillators
+---
+Basic oscillator classes to build on
+"""
 
 class Oscillator:
+    """
+    :param name: freq - Frequency in Hz
+    :param type: float
+    :param name: gain - Linear gain from 0.0 to 1.0
+    :param type: float
+    """
     def __init__(self, freq=100.0, gain=1.0, offset=0.0, gainct=None, fmct=None):
         self.freq = float(freq)
         self.gain = float(gain)
