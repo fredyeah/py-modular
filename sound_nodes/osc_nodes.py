@@ -15,12 +15,25 @@ Basic oscillator classes to build on
 
 class Oscillator:
     """
-    :param name: freq - Frequency in Hz
-    :param type: float
-    :param name: gain - Linear gain from 0.0 to 1.0
-    :param type: float
+    :param freq: Frequency in Hz of the oscillator
+    :type freq: float
+    :param gain: Gain from 0.0 to 1.0 of the oscillator, applied after processing
+    :type gain: float
+    :param offset: DC offset of signal, applied after processing
+    :type offset: float
+    :param gainct: A node that will control the oscillator gain on a sample by sample basis. Type is a class with a get_sample method which takes a time in seconds and returns a PCM sample value
+    :param fmct: An array of nodes that will control the oscillator frequency on a sample by sample basis. Type is a class with a get_sample method which takes a time in seconds and returns a PCM sample value
+    :ivar phi: Current phase offset of the oscillator
+    :vartype phi: float
     """
-    def __init__(self, freq=100.0, gain=1.0, offset=0.0, gainct=None, fmct=None):
+    def __init__(
+        self,
+        freq=100.0,
+        gain=1.0,
+        offset=0.0,
+        gainct=None,
+        fmct=None
+    ):
         self.freq = float(freq)
         self.gain = float(gain)
         self.offset = float(offset)
@@ -28,10 +41,28 @@ class Oscillator:
         self.fmct = fmct
         self.phi = 0.0
     def gain_to(self, gain):
+        """
+        :param gain: The gain which the oscillator should be adjusted to
+        :type gain: float
+        """
         self.gain = float(gain)
     def get_pcm_value(self, time):
+        """This method is inteded to be implemented by a sub class
+
+        
+        :param time: The time in seconds of which the PCM value should be gotten for
+        :type time: float
+        :returns: A PCM value for the oscillator at a given time
+        :rtype: float
+        """
         return 0.0
     def get_sample(self, time):
+        """
+        :param time: The time in seconds of which the sample should be gotten
+        :type time: float
+        :returns: A PCM value for the oscillator at a given time that has been adjusted with gain and offset
+        :rtype: float
+        """
         if not self.fmct == None:
             for fm in self.fmct:
                 self.phi = fm.get_sample(time) * 0.0001 + self.phi

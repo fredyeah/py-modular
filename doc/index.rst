@@ -6,6 +6,7 @@ API
 
 .. automodule:: sound_nodes.osc_nodes
     :members:
+    :show-inheritance:
 
 .. toctree::
    :maxdepth: 2
