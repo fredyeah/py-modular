@@ -1,4 +1,7 @@
-from osc_nodes import *
+import sys, os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+
+from sound_nodes.osc_nodes import *
 
 class FMSynth:
     def __init__(self):
