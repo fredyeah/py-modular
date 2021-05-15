@@ -1,7 +1,7 @@
 from random import randint, random
 
 class GranBase:
-    def __init__(self, grains, freq=20.0, gain=1.0, offset=0.0, gainct=None):
+    def __init__(self, grains, freq=20.0, jitter=100, gain=1.0, offset=0.0, gainct=None):
         self.grains = grains
         self.num_grains = len(grains)
         self.current_grain = 0
@@ -9,6 +9,7 @@ class GranBase:
         self.grain_positions = [0] * self.num_grains
         self.freq = float(freq)
         self.freq_in_seconds = 1.0 / self.freq
+        self.jitter = float(jitter)
         self.time = 0.0
         self.gain = float(gain)
         self.offset = float(offset)
@@ -16,13 +17,12 @@ class GranBase:
         self.phi = 0.0
     def gain_to(self, gain):
         self.gain = float(gain)
-    def freq_to(self, freq):
-        self.freq = float(freq)
-        self.freq_in_seconds = 1.0 / self.freq
+    def make_jitter(self):
+        self.freq_in_seconds = 1.0 / (self.freq + (random() - 0.5) * self.jitter)
     def fire_grain(self):
         self.current_grain = (self.current_grain + 1) % self.num_grains
         self.playing_grains.append(self.current_grain)
-        self.freq_to(random() * 10.0 + 20.0)
+        self.make_jitter()
     def get_pcm_value(self, time):
         values = []
         for grain in self.playing_grains:
@@ -35,11 +35,9 @@ class GranBase:
             return sum(values) / len(values)
         return 0.0
     def get_sample(self, time):
-        # time = time + (random() * -0.000001)
         if not self.gainct == None:
             self.gain_to(self.gainct.get_sample(time))
         if self.time > (time % self.freq_in_seconds):
-            # fire grain
             self.fire_grain()
         self.time = time % self.freq_in_seconds
         return self.get_pcm_value(time) * self.gain + self.offset
