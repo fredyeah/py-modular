@@ -26,14 +26,7 @@ class Oscillator:
     :ivar phi: Current phase offset of the oscillator
     :vartype phi: float
     """
-    def __init__(
-        self,
-        freq=100.0,
-        gain=1.0,
-        offset=0.0,
-        gainct=None,
-        fmct=None
-    ):
+    def __init__(self, freq=100.0, gain=1.0, offset=0.0, gainct=None, fmct=None):
         self.freq = float(freq)
         self.gain = float(gain)
         self.offset = float(offset)
@@ -134,7 +127,7 @@ class Random(Oscillator):
     def start_cycle(self, time):
         """
         :param time: A value of time in seconds
-        :type time: float 
+        :type time: float
         """
         self.start_time = time
         self.start_value = self.end_value
