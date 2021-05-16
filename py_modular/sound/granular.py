@@ -1,5 +1,4 @@
 from random import randint, random
-from math import floor, asin, sin, pi
 
 class GranBase:
     def __init__(self, grains, freq=10.0, jitter=0, random_offset=0, grain_range=[None, None], gain=1.0, offset=0.0, gainct=None):
@@ -48,17 +47,3 @@ class GranBase:
             pass
         self.time = time % self.freq_in_seconds
         return self.get_pcm_value(time) * self.gain + self.offset
-
-def window_grains_sin(grains=[]):
-    for grain in grains:
-        grain_length = len(grain)
-        for i in range(grain_length):
-            grain[i] = grain[i] * sin(i * pi / grain_length)
-    return grains
-
-def window_grains_tri(grains=[]):
-    for grain in grains:
-        grain_length = len(grain)
-        for i in range(grain_length):
-            grain[i] = grain[i] * (asin(sin(i * pi / grain_length)) / (0.5 * pi))
-    return grains
