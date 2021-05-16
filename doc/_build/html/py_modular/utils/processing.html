@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>utils &mdash; py-modular  documentation</title>
+  <title>processing &mdash; py-modular  documentation</title>
   
 
   
@@ -41,8 +41,7 @@
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="debug" href="debug.html" />
-    <link rel="prev" title="transport" href="../time/transport.html" /> 
+    <link rel="prev" title="debug" href="debug.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -91,9 +90,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../sound/index.html">sound</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../effects/index.html">effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../time/index.html">time</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">utils</a><ul>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">utils</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="debug.html">debug</a></li>
-<li class="toctree-l2"><a class="reference internal" href="processing.html">processing</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">processing</a></li>
 </ul>
 </li>
 </ul>
@@ -144,13 +143,15 @@
     
       <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>utils</li>
+          <li><a href="index.html">utils</a> &raquo;</li>
+        
+      <li>processing</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="../../_sources/py_modular/utils/index.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../_sources/py_modular/utils/processing.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -163,14 +164,42 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="utils">
-<h1>utils<a class="headerlink" href="#utils" title="Permalink to this headline">¶</a></h1>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="debug.html">debug</a></li>
-<li class="toctree-l1"><a class="reference internal" href="processing.html">processing</a></li>
-</ul>
-</div>
+  <div class="section" id="module-py_modular.utils.processing">
+<span id="processing"></span><h1>processing<a class="headerlink" href="#module-py_modular.utils.processing" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="py_modular.utils.processing.window_grains_sin">
+<span class="sig-name descname"><span class="pre">window_grains_sin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grains</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#py_modular.utils.processing.window_grains_sin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Util used to window an array of audio with half a sine wave</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>grains</strong> (<em>array</em><em>(</em><em>array</em><em>)</em>) – An array of audio buffers that contain audio data to be windowed</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An array of the same shape as the input, but windowed</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>array(array)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="py_modular.utils.processing.window_grains_tri">
+<span class="sig-name descname"><span class="pre">window_grains_tri</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grains</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#py_modular.utils.processing.window_grains_tri" title="Permalink to this definition">¶</a></dt>
+<dd><p>Util used to window an array of audio with half a triangle wave</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>grains</strong> (<em>array</em><em>(</em><em>array</em><em>)</em>) – An array of audio buffers that contain audio data to be windowed</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An array of the same shape as the input, but windowed</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>array(array)</p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 
 
@@ -179,8 +208,7 @@
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="debug.html" class="btn btn-neutral float-right" title="debug" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="../time/transport.html" class="btn btn-neutral float-left" title="transport" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="debug.html" class="btn btn-neutral float-left" title="debug" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

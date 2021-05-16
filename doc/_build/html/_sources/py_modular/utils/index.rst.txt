@@ -4,3 +4,4 @@ utils
 .. toctree::
 
     debug
+    processing
