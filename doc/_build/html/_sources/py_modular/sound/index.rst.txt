@@ -4,3 +4,4 @@ sound
 .. toctree::
 
    oscillators
+   granular
