@@ -3,7 +3,7 @@ Welcome to py-modular's documentation!
 
 .. toctree::
 
-   sound_nodes/index
+   sound/index
    effect_nodes/index
    time/index
    utils/index
