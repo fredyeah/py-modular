@@ -1,11 +1,24 @@
 import random
 
 class Event:
-    def __init__(self, nodes=None, sample_freq=48000, fs=48000):
+    """
+    :param nodes: An array of nodes that should have events triggered
+    :type nodes: array
+    """
+    def __init__(self, nodes=None):
         self.nodes = nodes
-        self.sample_freq = sample_freq
-        self.fs = fs
+    def event_callback(self, node, time):
+        """
+        :param node: A node for which an event should be called
+        :param time: A value of time in seconds
+        :type time: float 
+        """
+        pass
     def get_event(self, time):
+        """
+        :param time: A value of time in seconds
+        :type time: float
+        """
         for node in self.nodes:
             self.event_callback(node, time)
         return 0.0
