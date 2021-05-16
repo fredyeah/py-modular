@@ -1,16 +1,18 @@
-from util_nodes.debug_utils import *
-from sound_nodes.osc_nodes import *
-from sound_nodes.granular_nodes import *
-from effect_nodes.mixer_nodes import *
-from time_nodes.transport_nodes import *
-from time_nodes.event_nodes import *
-from time_nodes.env_nodes import *
-from effect_nodes.processing_nodes import *
-from effect_nodes.dsp_nodes import *
-from models.synth_models import *
 import numpy as np
 from sys import exit
 import matplotlib.pyplot as plt
+
+import py_modular as pm
+from py_modular.utils.debug import *
+from py_modular.sound.oscillators import *
+from py_modular.sound.granular import *
+from py_modular.effects.mixer import *
+from py_modular.effects.processing import *
+from py_modular.effects.dsp import *
+from py_modular.time.transport import *
+from py_modular.time.events import *
+from py_modular.time.envelopes import *
+from py_modular.models.synths import *
 
 sq = Square(1.0)
 sw = Sine(0.4)
