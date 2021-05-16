@@ -1,4 +1,4 @@
-Welcome to streamer's documentation!
+Welcome to py-modular's documentation!
 ====================================
 
 .. toctree::

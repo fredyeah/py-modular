@@ -19,7 +19,7 @@ add_module_names = False
 
 # -- Project information -----------------------------------------------------
 
-project = 'streamer'
+project = 'py-modular'
 copyright = '2021, fredyeah'
 author = 'fredyeah'
 
