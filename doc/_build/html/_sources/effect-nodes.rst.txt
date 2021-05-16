@@ -1,6 +1,9 @@
 Effect Nodes
 ============
 
-.. automodule:: effect_nodes.mixer_nodes
-    :members:
-    :show-inheritance:
+.. toctree::
+   :maxdepth: 2
+
+   dsp-nodes
+   mixer-nodes
+   processing-nodes

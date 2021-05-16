@@ -41,6 +41,7 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="DSP Nodes" href="dsp-nodes.html" />
     <link rel="prev" title="Sound Nodes" href="sound-nodes.html" /> 
 </head>
 
@@ -88,7 +89,12 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="sound-nodes.html">Sound Nodes</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Effect Nodes</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Effect Nodes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="dsp-nodes.html">DSP Nodes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mixer-nodes.html">Mixer Nodes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing-nodes.html">Processing Nodes</a></li>
+</ul>
+</li>
 </ul>
 
             
@@ -156,147 +162,15 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-effect_nodes.mixer_nodes">
-<span id="effect-nodes"></span><h1>Effect Nodes<a class="headerlink" href="#module-effect_nodes.mixer_nodes" title="Permalink to this headline">¶</a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="effect_nodes.mixer_nodes.Atten">
-<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">Atten</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#effect_nodes.mixer_nodes.Atten" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>node</strong> – The node that will be attenuated</p></li>
-<li><p><strong>gain</strong> (<em>float</em>) – The linear gain applied to the node</p></li>
+  <div class="section" id="effect-nodes">
+<h1>Effect Nodes<a class="headerlink" href="#effect-nodes" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dsp-nodes.html">DSP Nodes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mixer-nodes.html">Mixer Nodes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="processing-nodes.html">Processing Nodes</a></li>
 </ul>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="effect_nodes.mixer_nodes.Atten.get_sample">
-<span class="sig-name descname"><span class="pre">get_sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#effect_nodes.mixer_nodes.Atten.get_sample" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>time</strong> (<em>float</em>) – The time in seconds of which the sample should be gotten</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A PCM value for the node at the given time</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>float</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="effect_nodes.mixer_nodes.LinToExp">
-<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">LinToExp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">curve_gain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">curvect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#effect_nodes.mixer_nodes.LinToExp" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>node</strong> – The node whos output should be transformed</p></li>
-<li><p><strong>curve_gain</strong> (<em>float</em>) – A value between -1.0 and 1.0 that determines the ammount of transform. -1.0 is logarithmic, 1.0 is exponential, and 0.0 is linear.</p></li>
-<li><p><strong>curvect</strong> – A node that will directly control <cite>curve_gain</cite></p></li>
-</ul>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="effect_nodes.mixer_nodes.LinToExp.curve_gain_to">
-<span class="sig-name descname"><span class="pre">curve_gain_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#effect_nodes.mixer_nodes.LinToExp.curve_gain_to" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>value</strong> (<em>float</em>) – A value between -1.0 and 1.0 that will control <cite>curve_gain</cite></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="effect_nodes.mixer_nodes.LinToExp.get_sample">
-<span class="sig-name descname"><span class="pre">get_sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#effect_nodes.mixer_nodes.LinToExp.get_sample" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>time</strong> (<em>float</em>) – The time in seconds of which the sample should be gotten</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A PCM value for the node at the given time</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>float</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="effect_nodes.mixer_nodes.Mixer">
-<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">Mixer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gainct</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#effect_nodes.mixer_nodes.Mixer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>nodes</strong> – An array of nodes that should be mixed together. All nodes should have a <cite>get_sample</cite> method that, given a value of time, should return a PCM value</p></li>
-<li><p><strong>gain</strong> (<em>float</em>) – An ammount of gain, from 0.0 to 1.0 to apply to the output of the mixer</p></li>
-<li><p><strong>gainct</strong> – A node, with a <cite>get_sample</cite> method that, given a value of time, should return a PCM value. The <cite>get_sample</cite> output value will control the gain of the mixer on a sample by sample basis</p></li>
-</ul>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="effect_nodes.mixer_nodes.Mixer.get_sample">
-<span class="sig-name descname"><span class="pre">get_sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#effect_nodes.mixer_nodes.Mixer.get_sample" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>time</strong> (<em>float</em>) – The time in seconds of which the sample should be gotten</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A PCM value for the node at the given time</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>float</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="effect_nodes.mixer_nodes.Panner">
-<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">Panner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">posct</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#effect_nodes.mixer_nodes.Panner" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>node</strong> – A node that will be panned</p></li>
-<li><p><strong>pos</strong> (<em>float</em>) – A value between 0.0 and 1.0 that determines the possition betwen left and right channels</p></li>
-<li><p><strong>posct</strong> – A node that will control the position on a sample by sample basis</p></li>
-</ul>
-</dd>
-<dt class="field-even">Variables</dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>lch</strong> – A node that will output the left channel</p></li>
-<li><p><strong>rch</strong> – A node that will output the right channel</p></li>
-</ul>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="effect_nodes.mixer_nodes.Panner.get_sample">
-<span class="sig-name descname"><span class="pre">get_sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#effect_nodes.mixer_nodes.Panner.get_sample" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>time</strong> (<em>float</em>) – The time in seconds of which the sample should be gotten</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A PCM value for the node at the given time</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>float</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
+</div>
 </div>
 
 
@@ -305,6 +179,7 @@
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="dsp-nodes.html" class="btn btn-neutral float-right" title="DSP Nodes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
         <a href="sound-nodes.html" class="btn btn-neutral float-left" title="Sound Nodes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
