@@ -11,7 +11,7 @@ class Event:
         """
         :param node: A node for which an event should be called
         :param time: A value of time in seconds
-        :type time: float 
+        :type time: float
         """
         pass
     def get_event(self, time):
@@ -21,7 +21,6 @@ class Event:
         """
         for node in self.nodes:
             self.event_callback(node, time)
-        return 0.0
 
 class PitchEvent(Event):
     def event_callback(self, node, time):
