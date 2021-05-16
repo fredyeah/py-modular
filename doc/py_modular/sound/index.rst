@@ -1,0 +1,6 @@
+sound
+============
+
+.. toctree::
+
+   oscillators

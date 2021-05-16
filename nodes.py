@@ -1,16 +1,18 @@
-from util_nodes.debug_utils import *
-from sound_nodes.osc_nodes import *
-from sound_nodes.granular_nodes import *
-from effect_nodes.mixer_nodes import *
-from time_nodes.transport_nodes import *
-from time_nodes.event_nodes import *
-from time_nodes.env_nodes import *
-from effect_nodes.processing_nodes import *
-from effect_nodes.dsp_nodes import *
-from models.synth_models import *
 import numpy as np
 from sys import exit
 import matplotlib.pyplot as plt
+
+import py_modular as pm
+from py_modular.utils.debug import *
+from py_modular.sound.oscillators import *
+from py_modular.sound.granular import *
+from py_modular.effects.mixer import *
+from py_modular.effects.processing import *
+from py_modular.effects.dsp import *
+from py_modular.time.transport import *
+from py_modular.time.events import *
+from py_modular.time.envelopes import *
+from py_modular.models.synths import *
 
 sq = Square(1.0)
 sw = Sine(0.4)
@@ -54,7 +56,7 @@ fm.op3.freq = 300.0
 fm.op3.gainct = Saw(0.4)
 
 grains = np.load('clouds/debussy_embeddings_interpolated.npy')
-grains = window_grains_tri(grains)
+# grains = window_grains_tri(grains)
 gran = GranBase(grains)
 
 # plt.plot(grains[0])
@@ -69,6 +71,8 @@ md = MultiChannelDelay([gran], [1000, 2000], 1.2)
 
 tp = GlobalTransport([], 2, fs=16000.0)
 
+# graph_node_lin(LinToExp(Saw(freq=1, gain=1.0), 0.9), 48000)
+# exit()
 # TODO: should have three granulation types,
 # slice before generating embeddings
 # slice after generating embeddings
@@ -84,12 +88,12 @@ tp = GlobalTransport([], 2, fs=16000.0)
 # tp.chs[1].add_node(md)
 # tp.chs[0].add_node(gran)
 # tp.chs[1].add_node(gran)
-tp.chs[0].add_node(md)
-tp.chs[1].add_node(md)
+# tp.chs[0].add_node(md)
+# tp.chs[1].add_node(md)
 # tp.chs[0].add_node(md)
 # tp.chs[1].add_node(md)
 # tp.chs[2].add_node(fm)
-# tp.chs[0].add_node(kick)
+tp.chs[0].add_node(kick)
 # tp.chs[1].add_node(t)
 # tp.chs[2].add_node(t)
 # tp.chs[3].add_node(t)
@@ -97,7 +101,7 @@ tp.chs[1].add_node(md)
 # tp.chs[1].add_node(t)
 # tp.chs[1].add_node(t)
 # tp.chs[1].add_node(t)
-# tp.chs[1].add_node(kick)
+tp.chs[1].add_node(kick)
 
 tp.start()
 
