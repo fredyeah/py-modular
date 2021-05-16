@@ -1,4 +1,15 @@
 class Delay:
+    """
+    :param nodes: An array of nodes that should be delayed
+    :param len: The length of the delay line in samples
+    :type len: int
+    :param fb: The ammount of feedback into the delay line
+    :type fb: float
+    :ivar buffer: A buffer which contains audio data from the nodes
+    :vartype buffer: array
+    :ivar txrx: A pointer to the read/write position in the buffer
+    :vartype txrx: int
+    """
     def __init__(self, nodes, len, fb):
         self.nodes = nodes
         self.len = len
@@ -6,8 +17,17 @@ class Delay:
         self.txrx = 0
         self.fb = fb
     def add_input(self, node):
+        """
+        :param node: Node to add to the delay line
+        """
         self.nodes.append(node)
     def get_sample(self, time):
+        """
+        :param time: The time in seconds of which the sample should be gotten
+        :type time: float
+        :returns: A PCM value for the node at the given time
+        :rtype: float
+        """
         samp = 0.0
         for node in self.nodes:
             samp = node.get_sample(time) + samp
@@ -19,12 +39,23 @@ class Delay:
         return value
 
 class MultiTapDelay:
+    """
+    :param node: The node which should be delayed
+    :param taps: An array of positions where the delay line should be tapped
+    :type taps: array(int)
+    """
     def __init__(self, node, taps=[]):
         self.node = node
         self.taps = taps
         self.buffer = [0] * 48000
         self.count = 0
     def get_sample(self, time):
+        """
+        :param time: The time in seconds of which the sample should be gotten
+        :type time: float
+        :returns: A PCM value for the node at the given time
+        :rtype: float
+        """
         self.buffer[self.count] = self.node.get_sample(time)
         samp = 0.0
         for i in range(len(self.taps)):
@@ -35,16 +66,20 @@ class MultiTapDelay:
         self.count = (self.count + 1) % len(self.buffer)
         return (self.node.get_sample(time) + samp * 1.4) / 1.5
 
-class Channel:
-    def __init__(self, parent):
-        self.value = 0.0
-        self.parent = parent
-        pass
-    def get_sample(self, time):
-        value = self.parent.get_sample(time)
-        return value
-
 class MultiChannelDelay:
+    """
+    :param nodes: An array of nodes that should be fed into the delay line
+    :param len: An array of lengths for each delay channel
+    :type len: array(int)
+    :param fb: Ammount of feedback into the delay line
+    :type fb: float
+    :ivar buffer: An array of buffers of audio data in the delay line
+    :vartype buffer: array
+    :ivar txrx: An array of read/write position values for the respective delay buffers
+    :vartype txrx: array
+    :ivar ch_num: The current channel number which the buffer will be read from
+    :vartype ch_num: int 
+    """
     def __init__(self, nodes, len, fb):
         self.nodes = nodes
         self.len = [
@@ -59,8 +94,17 @@ class MultiChannelDelay:
         self.fb = fb
         self.ch_num = 0
     def add_input(self, node):
+        """
+        :param node: Node to add to the delay line
+        """
         self.nodes.append(node)
     def get_sample(self, time):
+        """
+        :param time: The time in seconds of which the sample should be gotten
+        :type time: float
+        :returns: A PCM value for the node at the given time
+        :rtype: float
+        """
         samp = 0.0
         for node in self.nodes:
             samp = node.get_sample(time) + samp
