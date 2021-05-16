@@ -23,7 +23,7 @@ class GranBase:
     :ivar grain_positions: An array of indecies that correspond to the playback posistion of each grain
     :vartype grain_positions: array(array)
     :ivar time: The last value of time recieved
-    :vartype time: float 
+    :vartype time: float
     """
     def __init__(self, grains, freq=10.0, jitter=0, random_offset=0, grain_range=[None, None], gain=1.0, offset=0.0):
         self.grains = grains
@@ -39,31 +39,50 @@ class GranBase:
         self.gain = float(gain)
         self.offset = float(offset)
     def gain_to(self, gain):
+        """
+        :param gain: A value to change the gain to
+        :type gain: float
+        """
         self.gain = float(gain)
     def make_jitter(self):
+        """A function that invokes an ammount of jitter on the grain firing frequency
+
+        """
         self.freq_in_seconds = 1.0 / (self.freq + (random() - 0.5) * self.jitter)
     def fire_grain(self):
+        """A function that fires a grain and increments pointers accordingly
+
+        """
         self.current_grain = (self.current_grain + 1 + floor(random() * self.random)) % self.num_grains
         self.playing_grains.append(self.current_grain)
         print(self.playing_grains)
         self.make_jitter()
         print('grain fired ' + str(self.current_grain))
     def get_pcm_value(self, time):
+        """
+        :param time: The time in seconds of which the PCM value should be gotten for
+        :type time: float
+        :returns: A PCM value for the granulator at a given time
+        :rtype: float
+        """
         values = []
         for grain in self.playing_grains:
             self.grain_positions[grain] = self.grain_positions[grain] + 1
             if(self.grain_positions[grain] >= len(self.grains[grain])):
                 self.playing_grains.remove(grain)
                 self.grain_positions[grain] = 0
-                # self.fire_grain()
             values.append(self.grains[grain][self.grain_positions[grain]])
         if(len(values) > 0):
             return sum(values) / len(values)
         return 0.0
     def get_sample(self, time):
-        # self.make_jitter()
+        """
+        :param time: The time in seconds of which the sample should be gotten
+        :type time: float
+        :returns: A PCM value for the granulator at a given time that has been adjusted with gain and offset
+        :rtype: float
+        """
         if self.time > (time % self.freq_in_seconds):
             self.fire_grain()
-            pass
         self.time = time % self.freq_in_seconds
         return self.get_pcm_value(time) * self.gain + self.offset
