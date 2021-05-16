@@ -1,6 +1,6 @@
 Transport Nodes
 ================
 
-.. automodule:: util_nodes.debug_utils
+.. automodule:: utils.debug
     :members:
     :show-inheritance:

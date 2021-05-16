@@ -54,7 +54,7 @@ fm.op3.freq = 300.0
 fm.op3.gainct = Saw(0.4)
 
 grains = np.load('clouds/debussy_embeddings_interpolated.npy')
-grains = window_grains_tri(grains)
+# grains = window_grains_tri(grains)
 gran = GranBase(grains)
 
 # plt.plot(grains[0])
@@ -69,6 +69,8 @@ md = MultiChannelDelay([gran], [1000, 2000], 1.2)
 
 tp = GlobalTransport([], 2, fs=16000.0)
 
+# graph_node_lin(LinToExp(Saw(freq=1, gain=1.0), 0.9), 48000)
+# exit()
 # TODO: should have three granulation types,
 # slice before generating embeddings
 # slice after generating embeddings
@@ -84,12 +86,12 @@ tp = GlobalTransport([], 2, fs=16000.0)
 # tp.chs[1].add_node(md)
 # tp.chs[0].add_node(gran)
 # tp.chs[1].add_node(gran)
-tp.chs[0].add_node(md)
-tp.chs[1].add_node(md)
+# tp.chs[0].add_node(md)
+# tp.chs[1].add_node(md)
 # tp.chs[0].add_node(md)
 # tp.chs[1].add_node(md)
 # tp.chs[2].add_node(fm)
-# tp.chs[0].add_node(kick)
+tp.chs[0].add_node(kick)
 # tp.chs[1].add_node(t)
 # tp.chs[2].add_node(t)
 # tp.chs[3].add_node(t)
@@ -97,7 +99,7 @@ tp.chs[1].add_node(md)
 # tp.chs[1].add_node(t)
 # tp.chs[1].add_node(t)
 # tp.chs[1].add_node(t)
-# tp.chs[1].add_node(kick)
+tp.chs[1].add_node(kick)
 
 tp.start()
 
