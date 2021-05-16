@@ -4,7 +4,7 @@ Welcome to py-modular's documentation!
 .. toctree::
 
    sound/index
-   effect_nodes/index
+   effects/index
    time/index
    utils/index
 
