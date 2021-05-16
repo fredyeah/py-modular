@@ -1,4 +1,5 @@
 from random import random
+random.__module__ = 'random'
 
 class GranBase:
     """
