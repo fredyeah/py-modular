@@ -1,6 +1,0 @@
-Util Nodes
-============
-
-.. toctree::
-
-    utils

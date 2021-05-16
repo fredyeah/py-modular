@@ -1,6 +1,0 @@
-Sound Nodes
-============
-
-.. toctree::
-
-   oscillators
