@@ -2,10 +2,9 @@ Welcome to streamer's documentation!
 ====================================
 
 .. toctree::
-   :maxdepth: 2
 
-   sound-nodes
-   effect-nodes
+   sound_nodes/index
+   effect_nodes/index
 
 Indices and tables
 ==================
