@@ -47,9 +47,7 @@ class Oscillator:
         """
         self.gain = float(gain)
     def get_pcm_value(self, time):
-        """This method is inteded to be implemented by a sub class
-
-        
+        """
         :param time: The time in seconds of which the PCM value should be gotten for
         :type time: float
         :returns: A PCM value for the oscillator at a given time
@@ -92,6 +90,11 @@ class Tri(Oscillator):
         return value
 
 class Square(Oscillator):
+    """
+    :param pwmct: A node which has a get_sample method which, given a value of time in seconds, returns a pcm value for that time
+    :ivar th: The threshold of determining a high or low of the square wave
+    :vartype th: float
+    """
     def __init__(self, freq=100.0, gain=1.0, offset=0.0, gainct=None, fmct=None, pwmct=None):
         super().__init__(freq, gain, offset, gainct, fmct)
         self.pwmct = pwmct
@@ -109,6 +112,18 @@ class Square(Oscillator):
         return value
 
 class Random(Oscillator):
+    """
+    :ivar time_period: The time in seconds it takes to move from one random value to the next
+    :vartype time_period: float
+    :ivar start_time: The time in seconds at which the last cycle started
+    :vartype start_time: float
+    :ivar start_value: The value that the oscillator moves from during a cycle
+    :vartype start_value: float
+    :ivar end_value: The value that the oscillator moves to during a cycle
+    :vartype end_value: float
+    :ivar range: The difference of `end_value` and `start_value`
+    :vartype range: float
+    """
     def __init__(self, freq=100.0, gain=1.0, offset=0.0, gainct=None, fmct=None):
         super().__init__(freq, gain, offset, gainct, fmct)
         self.time_period = 1.0 / float(freq)
@@ -117,6 +132,10 @@ class Random(Oscillator):
         self.end_value = (random.random() - 0.5) * 2.0
         self.range = self.end_value - self.start_value
     def start_cycle(self, time):
+        """
+        :param time: A value of time in seconds
+        :type time: float 
+        """
         self.start_time = time
         self.start_value = self.end_value
         self.end_value = (random.random() - 0.5) * 2.0
