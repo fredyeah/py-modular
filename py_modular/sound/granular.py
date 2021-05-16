@@ -1,4 +1,4 @@
-from random import randint, random
+from random import random
 
 class GranBase:
     """
