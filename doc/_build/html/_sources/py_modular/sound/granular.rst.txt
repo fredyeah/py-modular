@@ -1,4 +1,4 @@
-oscillators
+granular
 ================
 
 .. automodule:: py_modular.sound.granular
