@@ -38,14 +38,17 @@ class Envelope:
 
 class ExpEnv(Envelope):
     """
+    :param gain: A value that dictates the output signal's amplitude
+    :type gain: float 
     :param curve_gain: A value between -1.0 and 1.0 that determines the ammount of transform. -1.0 is logarithmic, 1.0 is exponential, and 0.0 is linear.
     :type curve_gain: float
     :param curvect: A node that will directly control `curve_gain`
     :param roll_off: A value that will control the ammount of filtering on sharp edges of the waveform
     :type roll_off: float
     """
-    def __init__(self, len, curve_gain=1.0, curvect=None, roll_off=100.0):
+    def __init__(self, len, gain=1.0, curve_gain=1.0, curvect=None, roll_off=100.0):
         super().__init__(len)
+        self.gain = float(gain)
         self.roll_off = roll_off
         self.curvect = curvect
         value = curve_gain * 0.999999
@@ -81,6 +84,6 @@ class ExpEnv(Envelope):
             s = math.atan(math.tan(phase)) * -1.0 / math.pi + 0.5
             value = math.pow(s, self.curve_gain)
             self.last_value = (value + self.roll_off * self.last_value) / (self.roll_off + 1)
-            return self.last_value
+            return self.last_value * self.gain
         else:
             return 0.0
