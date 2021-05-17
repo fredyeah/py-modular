@@ -38,6 +38,8 @@ class Envelope:
 
 class ExpEnv(Envelope):
     """
+    :param gain: A value that dictates the output signal's amplitude
+    :type gain: float 
     :param curve_gain: A value between -1.0 and 1.0 that determines the ammount of transform. -1.0 is logarithmic, 1.0 is exponential, and 0.0 is linear.
     :type curve_gain: float
     :param curvect: A node that will directly control `curve_gain`
