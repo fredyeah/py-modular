@@ -1,7 +1,0 @@
-sound
-============
-
-.. toctree::
-
-   oscillators
-   granular
