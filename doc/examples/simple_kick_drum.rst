@@ -44,3 +44,11 @@ Put everything in the global transport, then run `python simple_kick_drum.py` an
 .. literalinclude:: ../../examples/simple_kick_drum.py
     :language: python
     :lines: 19-23
+
+You should have something that sounds like this
+
+.. raw:: html
+
+    <audio controls="controls">
+        <source src="../_static/simple_kick_drum.wav" type="audio/wav">
+    </audio>

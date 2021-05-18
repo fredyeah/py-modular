@@ -48,3 +48,9 @@ Finally we call the `start` method of the transport, which will begin an audio p
     :lines: 14
 
 Try running the script with `python random_sine_wave.py`, you should hear a sine wave changing smoothly in pitch.
+
+.. raw:: html
+
+    <audio controls="controls">
+        <source src="../_static/random_sine_wave.wav" type="audio/wav">
+    </audio>

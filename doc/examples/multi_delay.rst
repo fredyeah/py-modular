@@ -50,4 +50,12 @@ Since it is a multichannel delay, it will take care of deciding which sounds go 
 
 .. warning::
     Since `py-modular` is not optimized for real time performance yet, this tutorial may perform poorly on computers that are not high performance.
-    We recommend using the recording utilities to create .wav files and listen back to the results that way for now. 
+    We recommend using the recording utilities to create .wav files and listen back to the results that way for now.
+
+The output should be similar to this, keeping in mind the pitches are randomly generated 
+
+.. raw:: html
+
+    <audio controls="controls">
+        <source src="../_static/multi_delay.wav" type="audio/wav">
+    </audio>

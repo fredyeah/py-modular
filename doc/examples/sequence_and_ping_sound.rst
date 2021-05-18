@@ -45,3 +45,11 @@ This will make sure that the events are synced to the session on a sample by sam
 .. literalinclude:: ../../examples/sequence_and_ping_sound.py
     :language: python
     :lines: 20-24
+
+Your audio output should sound simlar to this 
+
+.. raw:: html
+
+    <audio controls="controls">
+        <source src="../_static/sequence_and_ping_sound.wav" type="audio/wav">
+    </audio>
