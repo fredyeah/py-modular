@@ -81,7 +81,7 @@ def record_file(node, filename='recorded_wave.wav', seconds=5):
     :type seconds: int
     """
     buffer = []
-    # TODO: get samplerate from node? 
+    # TODO: get samplerate from node?
     for i in range(48000 * seconds):
         samp = node.get_sample(i / 48000.0) / 10.0
         buffer.append(samp)
@@ -95,9 +95,10 @@ def record_transport(tp, filename='recorded_session.wav', seconds=5):
     :param seconds: Number of seconds to record for
     :type seconds: int
     """
-    # TODO: is this even working?
-    buffer = [[],[]]
+    buffer = []
     blocks = int(seconds * 48000 / 1024)
     for i in range(blocks):
-        buffer = tp.get_block()
+        print(str(i * 100 / blocks) + ' %')
+        tp.get_block()
+        buffer = buffer + tp.block
     sf.write(filename, buffer, 48000)

@@ -8,3 +8,4 @@ Examples
     simple_kick_drum
     sequence_and_ping_sound
     multi_delay
+    record_audio
