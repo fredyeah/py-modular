@@ -1,3 +1,5 @@
+from math import floor
+
 class Delay:
     """
     :param nodes: An array of nodes that should be delayed
@@ -10,12 +12,13 @@ class Delay:
     :ivar txrx: A pointer to the read/write position in the buffer
     :vartype txrx: int
     """
-    def __init__(self, nodes, len, fb):
+    def __init__(self, nodes, len, fb, lenct=None):
         self.nodes = nodes
         self.len = len
         self.buffer = [0.0] * len
         self.txrx = 0
         self.fb = fb
+        self.lenct = lenct
     def add_input(self, node):
         """
         :param node: Node to add to the delay line
@@ -28,6 +31,8 @@ class Delay:
         :returns: A PCM value for the node at the given time
         :rtype: float
         """
+        if not self.lenct == None:
+            self.len = floor(abs(self.lenct.get_sample(time)))
         samp = 0.0
         for node in self.nodes:
             samp = node.get_sample(time) + samp
@@ -78,7 +83,7 @@ class MultiChannelDelay:
     :ivar txrx: An array of read/write position values for the respective delay buffers
     :vartype txrx: array
     :ivar ch_num: The current channel number which the buffer will be read from
-    :vartype ch_num: int 
+    :vartype ch_num: int
     """
     def __init__(self, nodes, len, fb):
         self.nodes = nodes

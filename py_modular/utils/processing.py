@@ -8,7 +8,8 @@ def window_grains_sin(grains=[]):
     :returns: An array of the same shape as the input, but windowed
     :rtype: array(array)
     """
-    for grain in grains:
+    for index, grain in enumerate(grains):
+        print('windowed ' + str(index) + ' grains')
         grain_length = len(grain)
         for i in range(grain_length):
             grain[i] = grain[i] * sin(i * pi / grain_length)
@@ -22,7 +23,8 @@ def window_grains_tri(grains=[]):
     :returns: An array of the same shape as the input, but windowed
     :rtype: array(array)
     """
-    for grain in grains:
+    for index, grain in enumerate(grains):
+        print('windowed ' + str(index) + ' grains')
         grain_length = len(grain)
         for i in range(grain_length):
             grain[i] = grain[i] * (asin(sin(i * pi / grain_length)) / (0.5 * pi))

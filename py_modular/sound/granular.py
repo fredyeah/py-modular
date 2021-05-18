@@ -1,4 +1,5 @@
 from random import random
+from math import floor
 random.__module__ = 'random'
 
 class GranBase:
@@ -25,8 +26,10 @@ class GranBase:
     :vartype grain_positions: array(array)
     :ivar time: The last value of time recieved
     :vartype time: float
+    :ivar increment: The number of grains to increment every time a grain is fired.
+    :vartype increment: int
     """
-    def __init__(self, grains, freq=10.0, jitter=0, random_offset=0, grain_range=[None, None], gain=1.0, offset=0.0):
+    def __init__(self, grains, freq=10.0, jitter=0, random_offset=0, gain=1.0, offset=0.0):
         self.grains = grains
         self.num_grains = len(grains)
         self.current_grain = 0
@@ -39,6 +42,7 @@ class GranBase:
         self.time = 0.0
         self.gain = float(gain)
         self.offset = float(offset)
+        self.increment = 1
     def gain_to(self, gain):
         """
         :param gain: A value to change the gain to
@@ -54,11 +58,13 @@ class GranBase:
         """A function that fires a grain and increments pointers accordingly
 
         """
-        self.current_grain = (self.current_grain + 1 + floor(random() * self.random)) % self.num_grains
+        self.current_grain = (self.current_grain + self.increment + floor(random() * self.random * self.increment)) % self.num_grains
+        if self.current_grain >= self.num_grains - 1:
+            self.increment = -1
+        if self.current_grain <= 0:
+            self.increment = 1
         self.playing_grains.append(self.current_grain)
-        print(self.playing_grains)
         self.make_jitter()
-        print('grain fired ' + str(self.current_grain))
     def get_pcm_value(self, time):
         """
         :param time: The time in seconds of which the PCM value should be gotten for
