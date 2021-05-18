@@ -21,7 +21,7 @@ def get_ping_sound():
     ping_sound = Tri(freq=250.0, gain=0.75, gainct=gain_envelope, fmct=[pitch_envelope, pitch_variation])
     return ping_sound, sequencer
 
-num_pings = 20
+num_pings = 7
 event_handlers = []
 sounds = []
 

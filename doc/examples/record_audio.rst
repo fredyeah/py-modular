@@ -25,3 +25,10 @@ We can also define the number of seconds to record and the file name.
     :lines: 39
 
 That's it! There should be a new .wav file in the working directory with your recorded audio.
+The output should sound something like this
+
+.. raw:: html
+
+    <audio controls="controls">
+        <source src="../_static/recorded_session.wav" type="audio/wav">
+    </audio>
