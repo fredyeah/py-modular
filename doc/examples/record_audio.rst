@@ -30,5 +30,5 @@ The output should sound something like this
 .. raw:: html
 
     <audio controls="controls">
-        <source src="../_static/recorded_session.wav" type="audio/wav">
+        <source src="../_static/record_audio.wav" type="audio/wav">
     </audio>
