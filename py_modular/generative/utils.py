@@ -10,19 +10,6 @@ from magenta.models.nsynth.wavenet.fastgen import generate_audio_sample
 from magenta.models.nsynth.wavenet.fastgen import load_fastgen_nsynth
 from magenta.models.nsynth.wavenet.fastgen import save_batch
 
-def load_checkpoint(name: str, dir: str):
-    """
-    :param name: Name of the checkpoint to load
-    :type name: string
-    :param dir: Directory where the checkpoint is stored
-    :type dir: string
-    """
-    tf.io.gfile.makedirs(dir)
-    target = os.path.join(dir, f"{name}.tar")
-    tar = tarfile.open(target)
-    tar.extractall(dir)
-    tar.close()
-
 def save_grain_cloud(grains, name='generated_grain_cloud'):
     """
     :param grains: Array of grains to save
@@ -54,7 +41,7 @@ def mix_two_grains(grains):
     grain = (grains[0] + grains[1]) / 2.0
     return grain
 
-def create_grains(file_name: str, file_location: str, grain_size=1024, grain_space=0, grain_offset=0, number_of_grains=8):
+def create_grains(file_name: str, file_location: str, grain_size=1024, grain_space=0, grain_offset=0, number_of_grains=8, checkpoint=None):
     """
     :param file_name: The name of the audio file to be granulated
     :type file_name: string
@@ -68,13 +55,13 @@ def create_grains(file_name: str, file_location: str, grain_size=1024, grain_spa
     :type grain_offset: int
     :param number_of_grains: The number of grains to generate
     :type number_of_grains: int
+    :param checkpoint: The model checkpoint which will be used for encoding the grains
+    :type checkpoint: string
     :returns: An array of encoded grains
     :rtype: array
     """
     if grain_size < 512:
         raise Exception("minimum grain size is 512 samples")
-    if grain_size * 2 > grain_space:
-        raise Exception("grain space must be at least twice the size of one grain")
 
     # TODO: make sample rate variable
     audio_file = utils.load_audio(os.path.join(file_location, file_name), sample_length=-1, sr=48000)
@@ -82,6 +69,9 @@ def create_grains(file_name: str, file_location: str, grain_size=1024, grain_spa
 
     if grain_space == 0:
         grain_space = audio_length
+
+    if grain_size * 2 > grain_space:
+        raise Exception("grain space must be at least twice the size of one grain")
 
     min_offset = grain_offset
     max_offset = grain_offset + grain_space
@@ -97,8 +87,8 @@ def create_grains(file_name: str, file_location: str, grain_size=1024, grain_spa
     grains_a = [audio_file[pos:(pos + grain_size)] for pos in grain_positions_a]
     grains_b = [audio_file[pos:(pos + grain_size)] for pos in grain_positions_b]
 
-    grains_a = encode_grains(np.array(grains_a))
-    grains_b = encode_grains(np.array(grains_b))
+    grains_a = encode_grains(np.array(grains_a), checkpoint=checkpoint)
+    grains_b = encode_grains(np.array(grains_b), checkpoint=checkpoint)
 
     grains_mixed = []
     for i in range(number_of_grains):
@@ -129,22 +119,22 @@ def interpolate_grains(encoded_grains, number_of_grains=8):
     return np.array(interpolated_grains)
 
 
-def generate_grains(encoded_grains, checkpoint_path: str):
+def generate_grains(encoded_grains, checkpoint: str):
     """
     :param encoded_grains: A list of encoded grains to be synthesized back into audio
     :type encoded_grains: array
-    :param checkpoint_path: The path and name of the checkpoint to use for synthesis
-    :type checkpoint_path: string
+    :param checkpoint: The path and name of the checkpoint to use for synthesis
+    :type checkpoint: string
     :returns: An array of audio buffers
     :rtype: array
     """
     session_config = tf.ConfigProto(allow_soft_placement=True)
     session_config.gpu_options.allow_growth = True
 
-    with tff.Graph().as_default(), tf.Session(config=session_config) as sess:
+    with tf.Graph().as_default(), tf.Session(config=session_config) as sess:
         net = load_fastgen_nsynth(batch_size=encoded_grains.shape[0])
         saver = tf.train.Saver()
-        saver.restore(sess, checkpoint_path)
+        saver.restore(sess, checkpoint)
 
         batch_size, encoding_length, _ = encoded_grains.shape
         hop_length = Config().ae_hop_length
