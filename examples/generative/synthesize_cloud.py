@@ -13,10 +13,10 @@ windowed_grains = window_grains_sin(grains)
 
 granulator = GranBase(windowed_grains, freq=5.0, jitter=3)
 
-delay = Delay([granulator], 43000, 0.7)
-delay = Delay([delay], 40000, 0.7)
-delay = Delay([delay], 30000, 0.7)
-delay = Delay([delay], 20000, 0.7)
+delay_b = Delay([granulator], 43000, 0.7)
+delay_b = Delay([delay_b], 40000, 0.7)
+delay_b = Delay([delay_b], 30000, 0.7)
+delay_b = Delay([delay_b], 20000, 0.7)
 
 delay_a = Delay([granulator], 42900, 0.7)
 delay_a = Delay([delay_a], 40000, 0.7)
@@ -24,6 +24,6 @@ delay_a = Delay([delay_a], 30000, 0.7)
 delay_a = Delay([delay_a], 20000, 0.7)
 
 global_transport = GlobalTransport([])
-global_transport.chs[0].add_node(delay)
+global_transport.chs[0].add_node(delay_b)
 global_transport.chs[1].add_node(delay_a)
 global_transport.start()
