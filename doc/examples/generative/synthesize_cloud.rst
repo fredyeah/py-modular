@@ -48,5 +48,5 @@ Lastly, we can play and record the audio. It should sound something like the fol
 .. raw:: html
 
     <audio controls="controls">
-        <source src="../_static/synthesize_cloud.wav" type="audio/wav">
+        <source src="../../_static/synthesize_cloud.wav" type="audio/wav">
     </audio>
