@@ -1,13 +1,12 @@
-Welcome to py-modular's documentation!
-======================================
+Welcome to the py-modular project site
+=======================================
 
 .. toctree::
 
-   api
-   examples/index
-
-Indices and tables
-==================
+    about/index
+    examples/index
+    api
+    resources/index
 
 * :ref:`genindex`
 * :ref:`modindex`
