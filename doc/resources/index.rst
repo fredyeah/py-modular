@@ -1,6 +1,9 @@
 Resources
 ===========================================
 
+A collection of resources used in the development process of this project, or that are just interesting and related.
+This is for those who want to learn more or dive deeper into audio programming. 
+
 +------------------------------------------------------------------------------------------------------------------------+
 |AI and new technologies                                                                                                 |
 +========================================================================================================================+
