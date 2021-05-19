@@ -1,15 +1,18 @@
 from setuptools import find_packages
 from setuptools import setup
 
+with open("README.md", "r", encoding="utf-8") as fh:
+    long_description = fh.read()
+
 setup(
-    name='example-pkg-fredyeah',
-    version='0.0.5',  # pylint: disable=undefined-variable
-    description='example pkg',
-    long_description='',
+    name='py-modular',
+    version='0.0.1',
+    description='An experimental, modular audio programming environment in python',
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     url='https://github.com/fredyeah/py-modular',
-    author='fred',
-    author_email='example@example.com',
-    license='mit',
+    author='Frederic',
+    author_email='mark.s@catalyst-students.com',
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
@@ -23,7 +26,7 @@ setup(
         'matplotlib',
         'numpy',
         'Pillow',
-        'pycparser', 
+        'pycparser',
         'pyparsing',
         'python-dateutil',
         'six',
