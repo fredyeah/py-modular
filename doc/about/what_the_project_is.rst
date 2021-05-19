@@ -12,10 +12,10 @@ The project is meant to see what can be gained by breaking away from traditional
 .. centered:: How to use py-modular
 
 This project is intended to be used by anyone interested in music technology.
-Python is a great language for beginners and the project has a relatively simple syntax.
+Python_ is a great language for beginners and the project has a relatively simple syntax.
 There is a large range of concepts in the project, from beginner to advanced, and there will be more to come in the future.
 If you are a beginner to programming, try following the first few how-to's and make some simple generative systems.
-If you are more advanced, try to get some creative results with the generative module using Magenta's Nsynth.
+If you are more advanced, try to get some creative results with the generative module using Magenta_'s Nsynth_.
 Additionally, if you are a developer of any level, please feel free to contribute.
 py-modular is a project intended for learning, exploration, and trying new things.
 
@@ -32,4 +32,10 @@ If you only ever create music with a DAW, your music will become boring and you 
 Maybe that is a bit exaggerated, but the idea is clear.
 
 With that said, it is my hope that this project can become an inspiration for people who have never explored the more technical domains of music,
-and a useful tool of expression for everyone. 
+and a useful tool of expression for everyone.
+
+.. _Magenta: https://magenta.tensorflow.org/
+
+.. _Nsynth: https://magenta.tensorflow.org/nsynth
+
+.. _Python: https://www.python.org/
