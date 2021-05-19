@@ -85,6 +85,10 @@ class GlobalTransport:
     """
     :param event_handlers: An array of event handlers that should sync to this transport
     :type event_handlers: array
+    :param input_device: The input device index. Can be found by running `python -m sounddevice` and selecting your desired device
+    :type input_device: int
+    :param output_device: The output device index. Can be found by running `python -m sounddevice` and selecting your desired device
+    :type output_device: int
     :param channels: Number of channels the transport should have
     :type channels: int
     :param buffer_len: Audio buffer length of each channel
@@ -97,8 +101,8 @@ class GlobalTransport:
     :vartype block: array
     :ivar chs: An array of node handlers that will be called for each channel
     """
-    def __init__(self, event_handlers, channels=2, buffer_len=1024, fs=48000.0):
-        sd.default.device = [15, 15]
+    def __init__(self, event_handlers, input_device=0, output_device=0, channels=2, buffer_len=1024, fs=48000.0):
+        sd.default.device = [input_device, output_device]
         print("default device is: ", sd.default.device)
         self.buffer_len = buffer_len
         self.event_handlers = event_handlers

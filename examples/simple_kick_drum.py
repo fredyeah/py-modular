@@ -16,7 +16,7 @@ pitch_envelope = create_envelope(1, 0.9, 10, 10)
 
 kick = Sine(freq=60, gainct=gain_envelope, fmct=[pitch_envelope])
 
-global_transport = GlobalTransport([])
+global_transport = GlobalTransport([], input_device=15, output_device=15)
 global_transport.chs[0].add_node(kick)
 global_transport.chs[1].add_node(kick)
 

@@ -32,7 +32,7 @@ for i in range(num_pings):
 
 delay = MultiChannelDelay(sounds, [8477, 30298], 1.12)
 
-global_transport = GlobalTransport(event_handlers)
+global_transport = GlobalTransport(event_handlers, input_device=15, output_device=15)
 global_transport.chs[0].add_node(delay)
 global_transport.chs[1].add_node(delay)
 

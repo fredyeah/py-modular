@@ -23,7 +23,7 @@ delay_a = Delay([delay_a], 40000, 0.7)
 delay_a = Delay([delay_a], 30000, 0.7)
 delay_a = Delay([delay_a], 20000, 0.7)
 
-global_transport = GlobalTransport([])
+global_transport = GlobalTransport([], input_device=15, output_device=15)
 global_transport.chs[0].add_node(delay_b)
 global_transport.chs[1].add_node(delay_a)
 global_transport.start()
