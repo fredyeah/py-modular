@@ -17,7 +17,7 @@ sequencer = EventSequencer([trigger], sequence=[48000, 60000, 47000])
 
 ping_sound = Tri(freq=250.0, gain=0.75, gainct=gain_envelope, fmct=[pitch_envelope, pitch_variation])
 
-global_transport = GlobalTransport([sequencer])
+global_transport = GlobalTransport([sequencer], input_device=15, output_device=15)
 global_transport.chs[0].add_node(ping_sound)
 global_transport.chs[1].add_node(ping_sound)
 

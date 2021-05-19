@@ -34,6 +34,8 @@ This basically just says "we want the output of the random oscillator to control
 
 Now we will create a global transport, which we said earlier can be thought of as a DAW session.
 We will initialize the transport with default values, which will create two channels for us.
+We also need to pick our numbers for our input and output devices. 
+These can be found by running `python -m sounddevice` in your terminal.
 We can use the `add_node` method to add sounds to each channel.
 This just adds the sine wave we created to the left and right channels, or channels 0 and 1.
 
