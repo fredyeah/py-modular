@@ -31,8 +31,8 @@ I think that AI has a large potential with generative music techniques, and I wa
 Magenta provides an incredible framework for working with these technologies, even for someone like myself with little experience.
 I wanted to try and build on this and see how their code base could be integrated into more traditional synthesis techniques, which was the starting point for the Nsynth grain cloud generator.
 
-Another inspiration for the project and the generative aspects of the project, were creations like Endel, Databots, and Jukebox.
+Another inspiration for the project and the generative aspects of the project, were creations like Endel, Dadabots, and Jukebox.
 These are algorithms that generate entire songs, or constantly flowing music.
 I think the concept of abstracting composition, and writing an algorithm instead of a score, is interesting and unexplored by most creatives.
 
-.. note:: The resources page also contains a list of reference and resources used during the development of py-modular. I strongly recommend reading it over if you want to learn something new. 
+.. note:: The resources page also contains a list of reference and resources used during the development of py-modular. I strongly recommend reading it over if you want to learn something new.

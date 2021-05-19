@@ -6,6 +6,7 @@ Welcome to the py-modular project site
     about/index
     examples/index
     api
+    resources/index
 
 * :ref:`genindex`
 * :ref:`modindex`
